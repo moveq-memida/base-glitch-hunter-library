@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Glitch Hunter Library - Submit</title>
+  <link rel="stylesheet" href="glitch.css">
+</head>
+<body>
+  <div class="page">
+    <header class="page-header">
+      <h1 class="page-header__title">Glitch Hunter Library</h1>
+      <a href="index.html" class="page-header__action">Cancel</a>
+    </header>
+
+    <main class="page-main">
+      <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Submit a new glitch</h2>
+      <p style="color: var(--c-text-muted); margin-bottom: 2rem;">
+        Add a discovered glitch to the library. Please include detailed reproduction steps.
+      </p>
+
+      <form class="glitch-form">
+        <div class="glitch-form__field">
+          <label for="title">Title</label>
+          <input type="text" id="title" name="title" placeholder="e.g. Rolling into the wall causes falling" required>
+        </div>
+
+        <div class="glitch-form__field">
+          <label for="game">Game Name</label>
+          <input type="text" id="game" name="game" placeholder="e.g. Elden Ring" required>
+        </div>
+
+        <div class="glitch-form__field">
+          <label for="platform">Platform</label>
+          <select id="platform" name="platform">
+            <option value="pc">PC / Steam</option>
+            <option value="ps5">PlayStation 5</option>
+            <option value="switch">Nintendo Switch</option>
+            <option value="xbox">Xbox Series X/S</option>
+            <option value="mobile">Mobile (iOS/Android)</option>
+            <option value="retro">Retro Console</option>
+          </select>
+        </div>
+
+        <div class="glitch-form__field">
+          <label for="video">Video URL (YouTube/Twitch)</label>
+          <input type="url" id="video" name="video" placeholder="https://...">
+        </div>
+
+        <div class="glitch-form__field">
+          <label for="description">Description & Reproduction Steps</label>
+          <textarea id="description" name="description" rows="6" placeholder="1. Go to the specific cliff&#10;2. Use the item...&#10;3. ..." required></textarea>
+        </div>
+
+        <div class="glitch-form__field">
+          <label for="tags">Tags</label>
+          <input type="text" id="tags" name="tags" placeholder="physics, out-of-bounds, softlock">
+        </div>
+
+        <div style="margin-top: 1rem;">
+          <button type="button" class="wallet-button">
+            Connect Wallet to Submit
+          </button>
+          
+          <button type="submit" class="glitch-form__submit">
+            Submit Glitch
+          </button>
+        </div>
+      </form>
+    </main>
+  </div>
+</body>
+</html>
