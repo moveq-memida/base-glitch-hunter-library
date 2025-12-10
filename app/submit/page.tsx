@@ -217,7 +217,7 @@ export default function SubmitPage() {
             </p>
           )}
 
-          <div style={{ marginTop: '1rem' }}>
+          <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {!isConnected ? (
               <button type="button" className="wallet-button" onClick={handleConnect}>
                 Connect Wallet to Submit
