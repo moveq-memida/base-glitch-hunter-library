@@ -2,8 +2,9 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAccount, useConnect, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useAccount, useConnect, useWriteContract, useWaitForTransactionReceipt, useSwitchChain, useChainId } from 'wagmi';
 import { keccak256, toBytes } from 'viem';
+import { baseSepolia } from 'wagmi/chains';
 import Header from '@/components/Header';
 import { glitchRegistryABI, GLITCH_REGISTRY_ADDRESS } from '@/lib/contracts';
 
@@ -15,6 +16,8 @@ export default function SubmitPage() {
   const { address, isConnected } = useAccount();
   const { connect, connectors } = useConnect();
   const { writeContract, data: hash, isPending } = useWriteContract();
+  const chainId = useChainId();
+  const { switchChain } = useSwitchChain();
 
   const handleConnect = () => {
     const connector = connectors[0];
@@ -35,6 +38,17 @@ export default function SubmitPage() {
     if (!GLITCH_REGISTRY_ADDRESS) {
       setError('Contract address not configured. Please deploy the contract first.');
       return;
+    }
+
+    // Check if on correct network (Base Sepolia)
+    if (chainId !== baseSepolia.id) {
+      try {
+        await switchChain({ chainId: baseSepolia.id });
+      } catch (error) {
+        console.error('Network switch error:', error);
+        setError('Please switch to Base Sepolia network in your wallet');
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -214,6 +228,12 @@ export default function SubmitPage() {
           {error && (
             <p className="glitch-form__error" style={{ color: 'var(--c-danger)' }}>
               {error}
+            </p>
+          )}
+
+          {isConnected && chainId !== baseSepolia.id && (
+            <p style={{ color: 'var(--c-warning)', marginTop: '1rem', padding: '0.75rem', backgroundColor: 'rgba(255, 193, 7, 0.1)', borderRadius: '0.5rem' }}>
+              ⚠️ Wrong network detected. Please switch to Base Sepolia to submit glitches.
             </p>
           )}
 
