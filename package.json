@@ -1,0 +1,38 @@
+{
+  "name": "base-glitch-hunter-library",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moveq-memida/base-glitch-hunter-library.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/moveq-memida/base-glitch-hunter-library/issues"
+  },
+  "homepage": "https://github.com/moveq-memida/base-glitch-hunter-library#readme",
+  "description": "",
+  "dependencies": {
+    "@prisma/client": "^7.1.0",
+    "@tanstack/react-query": "^5.90.12",
+    "next": "^16.0.8",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
+    "viem": "^2.41.2",
+    "wagmi": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.2",
+    "@types/react": "^19.2.7",
+    "prisma": "^7.1.0",
+    "typescript": "^5.9.3"
+  }
+}

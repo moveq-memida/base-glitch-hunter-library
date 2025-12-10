@@ -1,0 +1,32 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Glitch {
+  id               Int      @id @default(autoincrement())
+  title            String
+  game_name        String
+  platform         String
+  video_url        String?
+  description      String   @db.Text
+  tags             String
+  author_address   String
+  onchain_glitch_id Int
+  content_hash     String
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  @@index([onchain_glitch_id])
+  @@index([created_at])
+}
