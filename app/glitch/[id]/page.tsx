@@ -187,13 +187,13 @@ export default function GlitchDetailPage({ params }: { params: Promise<{ id: str
 
             <section className="glitch-vote">
               <span className="glitch-vote__count">
-                {voteCount !== undefined ? voteCount.toString() : '0'}
+                {voteCount != null ? voteCount.toString() : '0'}
               </span>
               <button
                 type="button"
                 className="glitch-vote__button"
                 onClick={handleUpvote}
-                disabled={isPending || isConfirming || hasVoted || !isConnected}
+                disabled={isPending || isConfirming || !!hasVoted || !isConnected}
               >
                 {isPending || isConfirming
                   ? 'Voting...'
