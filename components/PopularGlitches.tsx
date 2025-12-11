@@ -74,9 +74,11 @@ export default function PopularGlitches({ glitches }: PopularGlitchesProps) {
       <div className="popular-section__list">
         {sortedGlitches.map((glitch, index) => (
           <div key={glitch.id} className="popular-section__item">
-            <span className="popular-section__rank">#{index + 1}</span>
+            <div className="popular-section__item-header">
+              <span className="popular-section__rank">#{index + 1}</span>
+              <span className="popular-section__votes">▲ {glitch.voteCount}</span>
+            </div>
             <GlitchCard glitch={glitch} compact />
-            <span className="popular-section__votes">▲ {glitch.voteCount}</span>
           </div>
         ))}
       </div>
