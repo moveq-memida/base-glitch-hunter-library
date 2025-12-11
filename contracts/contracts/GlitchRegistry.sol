@@ -31,6 +31,10 @@ contract GlitchRegistry {
             createdAt: block.timestamp
         });
 
+        // Auto-upvote by author
+        hasVoted[glitchId][msg.sender] = true;
+        voteCount[glitchId] = 1;
+
         nextGlitchId++;
 
         emit GlitchSubmitted(glitchId, msg.sender, contentHash);
