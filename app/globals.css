@@ -130,9 +130,15 @@ button, input, textarea, select {
 
 /* Components: Glitch Card */
 .glitch-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: var(--sp-md);
+}
+
+@media (min-width: 768px) {
+  .glitch-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .glitch-card {
