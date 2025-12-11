@@ -238,14 +238,17 @@ Get testnet ETH from the [Base Sepolia Faucet](https://www.coinbase.com/faucets/
 
 This app works as a Base / Farcaster Mini App.
 
+**Note**: CDP (Coinbase Developer Platform) API key is NOT required. This app uses public Base RPC endpoints and works without a CDP account.
+
 ### Required Environment Variables
 
 ```env
 # App URL (your deployed domain)
 NEXT_PUBLIC_APP_URL="https://your-app.vercel.app"
 
-# CDP Client API Key (from Coinbase Developer Portal)
-NEXT_PUBLIC_CDP_CLIENT_API_KEY="your_cdp_api_key"
+# Network configuration
+NEXT_PUBLIC_CHAIN="mainnet"  # or "sepolia" for testnet
+NEXT_PUBLIC_BASE_RPC_URL="https://mainnet.base.org"  # or "https://sepolia.base.org"
 
 # Farcaster Account Association (from Base Build tool)
 FARCASTER_HEADER=""
