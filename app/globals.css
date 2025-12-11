@@ -240,11 +240,26 @@ button, input, textarea, select {
   gap: var(--sp-sm);
 }
 
+@media (min-width: 768px) {
+  .popular-section__list {
+    flex-direction: row;
+    gap: var(--sp-md);
+  }
+}
+
 .popular-section__item {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
+  display: flex;
+  flex-direction: row;
   align-items: center;
   gap: var(--sp-sm);
+}
+
+@media (min-width: 768px) {
+  .popular-section__item {
+    flex: 1;
+    flex-direction: column;
+    text-align: center;
+  }
 }
 
 .popular-section__rank {
@@ -264,21 +279,24 @@ button, input, textarea, select {
 
 .popular-section__item .glitch-card {
   margin: 0;
+  flex: 1;
 }
 
-.popular-section__item .glitch-card--compact .glitch-card__thumb {
-  height: 80px;
+@media (min-width: 768px) {
+  .popular-section__item .glitch-card {
+    width: 100%;
+  }
+
+  .popular-section__item .glitch-card--compact .glitch-card__thumb {
+    height: 120px;
+  }
 }
 
 @media (max-width: 767px) {
-  .popular-section__item {
-    grid-template-columns: auto 1fr;
-  }
-
-  .popular-section__votes {
-    grid-column: 2;
-    justify-self: end;
-    margin-top: calc(-1 * var(--sp-xs));
+  .popular-section__item .glitch-card--compact .glitch-card__thumb {
+    height: 80px;
+    width: 120px;
+    min-width: 120px;
   }
 }
 
