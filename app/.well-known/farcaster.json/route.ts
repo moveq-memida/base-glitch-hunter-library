@@ -18,7 +18,7 @@ export function GET() {
       splashBackgroundColor: '#121212',
       subtitle: 'Game glitch archive on Base',
       description: 'A small onchain library for weird game glitches.',
-      primaryCategory: 'gaming',
+      primaryCategory: 'games',
       tags: ['games', 'glitch', 'base', 'miniapp'],
       heroImageUrl: `${baseUrl}/og.png`,
       ogTitle: 'Glitch Hunter Library',
