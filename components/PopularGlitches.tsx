@@ -1,9 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useReadContracts } from 'wagmi';
+import { createPublicClient, http } from 'viem';
+import { baseSepolia } from 'viem/chains';
 import GlitchCard from './GlitchCard';
 import { glitchRegistryABI, GLITCH_REGISTRY_ADDRESS } from '@/lib/contracts';
+
+const publicClient = createPublicClient({
+  chain: baseSepolia,
+  transport: http(),
+});
 
 interface Glitch {
   id: number;
@@ -21,35 +27,46 @@ interface PopularGlitchesProps {
 
 export default function PopularGlitches({ glitches }: PopularGlitchesProps) {
   const [sortedGlitches, setSortedGlitches] = useState<(Glitch & { voteCount: number })[]>([]);
-
-  // Create contract calls for each glitch's vote count
-  const contracts = glitches.map((glitch) => ({
-    address: GLITCH_REGISTRY_ADDRESS,
-    abi: glitchRegistryABI,
-    functionName: 'getVoteCount',
-    args: [BigInt(glitch.onchain_glitch_id)],
-  }));
-
-  const { data: voteCounts, isLoading } = useReadContracts({
-    contracts: GLITCH_REGISTRY_ADDRESS ? contracts : [],
-  });
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (voteCounts && voteCounts.length > 0) {
-      const glitchesWithVotes = glitches.map((glitch, index) => {
-        const result = voteCounts[index];
-        const voteCount = result?.status === 'success' ? Number(result.result) : 0;
-        return { ...glitch, voteCount };
-      });
+    async function fetchVoteCounts() {
+      if (!GLITCH_REGISTRY_ADDRESS || glitches.length === 0) {
+        setIsLoading(false);
+        return;
+      }
 
-      // Sort by vote count descending
-      const sorted = glitchesWithVotes
-        .sort((a, b) => b.voteCount - a.voteCount)
-        .slice(0, 3); // Top 3
+      try {
+        const voteCountPromises = glitches.map((glitch) =>
+          publicClient.readContract({
+            address: GLITCH_REGISTRY_ADDRESS!,
+            abi: glitchRegistryABI,
+            functionName: 'getVoteCount',
+            args: [BigInt(glitch.onchain_glitch_id)],
+          } as const).catch(() => BigInt(0))
+        );
 
-      setSortedGlitches(sorted);
+        const voteCounts = await Promise.all(voteCountPromises);
+
+        const glitchesWithVotes = glitches.map((glitch, index) => ({
+          ...glitch,
+          voteCount: Number(voteCounts[index]),
+        }));
+
+        const sorted = glitchesWithVotes
+          .sort((a, b) => b.voteCount - a.voteCount)
+          .slice(0, 3);
+
+        setSortedGlitches(sorted);
+      } catch (error) {
+        console.error('Error fetching vote counts:', error);
+      } finally {
+        setIsLoading(false);
+      }
     }
-  }, [voteCounts, glitches]);
+
+    fetchVoteCounts();
+  }, [glitches]);
 
   if (!GLITCH_REGISTRY_ADDRESS || glitches.length === 0) {
     return null;
