@@ -7,18 +7,11 @@ export const config = createConfig({
   connectors: [
     injected({
       shimDisconnect: true,
-      target() {
-        return {
-          id: 'injected',
-          name: 'Injected Wallet',
-          provider: typeof window !== 'undefined' ? window.ethereum : undefined,
-        };
-      },
     }),
   ],
   transports: {
     [base.id]: http(),
     [baseSepolia.id]: http(),
   },
-  ssr: true, // Enable SSR support
+  ssr: true,
 });
