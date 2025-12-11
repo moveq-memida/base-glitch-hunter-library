@@ -3,6 +3,7 @@ import Footer from '@/components/Footer';
 import GlitchCard from '@/components/GlitchCard';
 import SearchBar from '@/components/SearchBar';
 import Pagination from '@/components/Pagination';
+import PopularGlitches from '@/components/PopularGlitches';
 import { prisma } from '@/lib/prisma';
 import { Suspense } from 'react';
 
@@ -10,6 +11,26 @@ import { Suspense } from 'react';
 export const dynamic = 'force-dynamic';
 
 const PAGE_SIZE = 10;
+
+async function getAllGlitchesForRanking() {
+  try {
+    const glitches = await prisma.glitch.findMany({
+      select: {
+        id: true,
+        title: true,
+        game_name: true,
+        platform: true,
+        tags: true,
+        video_url: true,
+        onchain_glitch_id: true,
+      },
+    });
+    return glitches;
+  } catch (error) {
+    console.error('Error fetching glitches for ranking:', error);
+    return [];
+  }
+}
 
 async function getGlitches(query?: string, page: number = 1) {
   try {
@@ -55,7 +76,10 @@ interface HomePageProps {
 export default async function HomePage({ searchParams }: HomePageProps) {
   const { q, page } = await searchParams;
   const currentPage = Math.max(1, parseInt(page || '1', 10));
-  const { glitches, totalPages } = await getGlitches(q, currentPage);
+  const [{ glitches, totalPages }, allGlitches] = await Promise.all([
+    getGlitches(q, currentPage),
+    getAllGlitchesForRanking(),
+  ]);
 
   return (
     <div className="page">
@@ -69,6 +93,12 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             Record the "Glitch" you discovered.
           </p>
         </section>
+
+        {!q && currentPage === 1 && (
+          <Suspense fallback={<div style={{ color: 'var(--c-text-muted)' }}>Loading popular glitches...</div>}>
+            <PopularGlitches glitches={allGlitches} />
+          </Suspense>
+        )}
 
         <Suspense fallback={<div>Loading...</div>}>
           <SearchBar />
