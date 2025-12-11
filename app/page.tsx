@@ -4,6 +4,7 @@ import GlitchCard from '@/components/GlitchCard';
 import SearchBar from '@/components/SearchBar';
 import Pagination from '@/components/Pagination';
 import PopularGlitches from '@/components/PopularGlitches';
+import { MiniKitReady } from '@/components/MiniKitReady';
 import { prisma } from '@/lib/prisma';
 import { Suspense } from 'react';
 
@@ -83,6 +84,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
   return (
     <div className="page">
+      <MiniKitReady />
       <Header />
       <main className="page-main">
         <section className="page-intro">

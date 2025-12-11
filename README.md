@@ -234,6 +234,44 @@ Get testnet ETH from the [Base Sepolia Faucet](https://www.coinbase.com/faucets/
 - Verify contract on Basescan for transparency
 - Audit smart contracts before mainnet deployment
 
+## Mini App Support
+
+This app works as a Base / Farcaster Mini App.
+
+### Required Environment Variables
+
+```env
+# App URL (your deployed domain)
+NEXT_PUBLIC_APP_URL="https://your-app.vercel.app"
+
+# CDP Client API Key (from Coinbase Developer Portal)
+NEXT_PUBLIC_CDP_CLIENT_API_KEY="your_cdp_api_key"
+
+# Farcaster Account Association (from Base Build tool)
+FARCASTER_HEADER=""
+FARCASTER_PAYLOAD=""
+FARCASTER_SIGNATURE=""
+```
+
+### Manifest Verification
+
+Check your manifest at: `https://<your-domain>/.well-known/farcaster.json`
+
+### Account Association Setup
+
+1. Go to [Base Build](https://build.base.org/) and find the Account Association tool
+2. Enter your production URL
+3. Copy the `header`, `payload`, and `signature` values
+4. Set them as environment variables (`FARCASTER_HEADER`, `FARCASTER_PAYLOAD`, `FARCASTER_SIGNATURE`)
+5. Redeploy or restart your app
+
+### Required Assets
+
+Place these images in your `public/` folder:
+- `icon.png` - App icon (recommended: 512x512)
+- `splash.png` - Splash screen image
+- `og.png` - Open Graph / hero image
+
 ## License
 
 ISC
