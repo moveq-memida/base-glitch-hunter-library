@@ -19,6 +19,31 @@ interface Glitch {
   onchain_glitch_id: number;
 }
 
+function getYouTubeEmbedUrl(url: string | null): string | null {
+  if (!url) return null;
+
+  // Already an embed URL
+  if (url.includes('youtube.com/embed/')) {
+    return url;
+  }
+
+  // Extract video ID from various YouTube URL formats
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
+    /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match && match[1]) {
+      return `https://www.youtube.com/embed/${match[1]}`;
+    }
+  }
+
+  // Not a YouTube URL, return as-is (for other video services)
+  return url;
+}
+
 interface GlitchDetailClientProps {
   glitch: Glitch | null;
 }
@@ -138,14 +163,14 @@ export default function GlitchDetailClient({ glitch }: GlitchDetailClientProps) 
                 <iframe
                   width="100%"
                   height="100%"
-                  src={glitch.video_url}
+                  src={getYouTubeEmbedUrl(glitch.video_url) || ''}
                   title={glitch.title}
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 />
               ) : (
-                <span>Video Player Area</span>
+                <span>No Video</span>
               )}
             </div>
           </div>
