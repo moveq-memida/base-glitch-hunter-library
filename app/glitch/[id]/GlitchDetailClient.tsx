@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import GlitchCard from '@/components/GlitchCard';
 import { glitchRegistryABI, GLITCH_REGISTRY_ADDRESS } from '@/lib/contracts';
 
 interface Glitch {
@@ -44,11 +45,21 @@ function getYouTubeEmbedUrl(url: string | null): string | null {
   return url;
 }
 
-interface GlitchDetailClientProps {
-  glitch: Glitch | null;
+interface RelatedGlitch {
+  id: number;
+  title: string;
+  game_name: string;
+  platform: string;
+  tags: string;
+  video_url: string | null;
 }
 
-export default function GlitchDetailClient({ glitch }: GlitchDetailClientProps) {
+interface GlitchDetailClientProps {
+  glitch: Glitch | null;
+  relatedGlitches?: RelatedGlitch[];
+}
+
+export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: GlitchDetailClientProps) {
   const [error, setError] = useState<string | null>(null);
 
   const { address, isConnected } = useAccount();
@@ -219,13 +230,16 @@ export default function GlitchDetailClient({ glitch }: GlitchDetailClientProps) 
           </div>
         </section>
 
-        <section className="glitch-related">
-          <h3 className="glitch-related__title">Related Glitches</h3>
-          <div className="glitch-list">
-            {/* TODO: Fetch related glitches */}
-            <p style={{ color: 'var(--c-text-muted)' }}>No related glitches yet.</p>
-          </div>
-        </section>
+        {relatedGlitches.length > 0 && (
+          <section className="glitch-related">
+            <h3 className="glitch-related__title">More from {glitch.game_name}</h3>
+            <div className="glitch-list">
+              {relatedGlitches.map((related) => (
+                <GlitchCard key={related.id} glitch={related} compact />
+              ))}
+            </div>
+          </section>
+        )}
       </main>
       <Footer />
     </div>

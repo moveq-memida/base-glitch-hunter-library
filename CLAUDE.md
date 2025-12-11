@@ -6,64 +6,76 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Glitch Hunter Library** is a Web3 dApp for discovering, submitting, and voting on video game glitches (bugs, exploits, and odd behaviors). The project combines:
 
-- **Frontend**: Next.js (App Router) + TypeScript + wagmi + viem
-- **Backend**: Next.js Route Handlers + PostgreSQL (Prisma or Drizzle ORM)
+- **Frontend**: Next.js 16 (App Router) + TypeScript + wagmi + viem
+- **Backend**: Next.js Route Handlers + PostgreSQL (Prisma ORM v6)
 - **Blockchain**: Solidity smart contract on Base network (Sepolia testnet → mainnet)
-- **Static UI**: Pre-built HTML/CSS templates that need to be converted to React components
+- **Web3 Integration**: wagmi v3 + viem v2 for type-safe contract interactions
 
 ## Architecture
 
 ### Page Structure
 
 The application has three main pages:
-- `/` - Glitch listing page (index.html → app/page.tsx)
-- `/submit` - Glitch submission form (submit.html → app/submit/page.tsx)
-- `/glitch/[id]` - Individual glitch detail page (detail.html → app/glitch/[id]/page.tsx)
+- `/` - Glitch listing page (`app/page.tsx`)
+- `/submit` - Glitch submission form (`app/submit/page.tsx`)
+- `/glitch/[id]` - Individual glitch detail page (`app/glitch/[id]/page.tsx`)
 
-### Component Breakdown
+### Component Structure
 
-Extract reusable components from the static HTML into `components/`:
+Reusable components in `components/`:
 - **Header.tsx** - Navigation header with title and action button
 - **Footer.tsx** - Footer with copyright and links
 - **GlitchCard.tsx** - Card component for displaying glitch previews
-- **GlitchForm.tsx** - Form for submitting new glitches
+- **Providers.tsx** - Wraps app with wagmi and TanStack Query providers
 
-### CSS Integration
+### Library Structure
 
-The complete stylesheet is in `glitch.css` and should be imported in `app/layout.tsx`. The CSS uses:
-- CSS custom properties for theming (dark theme with muted violet accents)
-- Mobile-first responsive design with desktop breakpoints
-- BEM-style naming conventions (e.g., `glitch-card__title`)
+Key files in `lib/`:
+- **wagmi.ts** - wagmi configuration for Base and Base Sepolia chains with injected connector
+- **contracts.ts** - GlitchRegistry ABI and contract address (from `NEXT_PUBLIC_GLITCH_REGISTRY_ADDRESS`)
+- **prisma.ts** - Prisma client singleton for database connections
+- **generated/** - TypeChain types for contract interactions
 
-### Database Schema (Glitch)
+### Database Schema
 
-```typescript
-{
-  id: string | number,
-  title: string,
-  game_name: string,
-  platform: string,
-  video_url: string,
-  description: text,
-  tags: string, // comma-separated
-  author_address: string,
-  onchain_glitch_id: number,
-  content_hash: string,
-  created_at: timestamp,
-  updated_at: timestamp
+Located in `prisma/schema.prisma`:
+
+```prisma
+model Glitch {
+  id               Int      @id @default(autoincrement())
+  title            String
+  game_name        String
+  platform         String
+  video_url        String?
+  description      String   @db.Text
+  tags             String   // comma-separated
+  author_address   String
+  onchain_glitch_id Int     // Links to blockchain glitchId
+  content_hash     String   // keccak256 hash for verification
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  @@index([onchain_glitch_id])
+  @@index([created_at])
 }
 ```
 
 ### Smart Contract Architecture
 
-**GlitchRegistry.sol** on Base network stores:
-- Glitch submissions: `mapping(uint256 => Glitch)` where `Glitch` contains `author`, `contentHash`, `createdAt`
-- Voting state: `mapping(uint256 => mapping(address => bool)) hasVoted` and `mapping(uint256 => uint256) voteCount`
+**GlitchRegistry.sol** (Solidity 0.8.24) on Base network:
+
+State variables:
+- `mapping(uint256 => Glitch) public glitches` - Stores glitch data (author, contentHash, createdAt)
+- `uint256 public nextGlitchId` - Auto-incrementing glitch ID counter
+- `mapping(uint256 => mapping(address => bool)) public hasVoted` - Tracks votes per address
+- `mapping(uint256 => uint256) public voteCount` - Vote counts per glitch
 
 Key functions:
-- `submitGlitch(bytes32 contentHash)` - Records new glitch on-chain, returns glitchId
-- `upvote(uint256 glitchId)` - Allows one vote per address per glitch
-- `getVoteCount(uint256 glitchId)` - Returns current vote count
+- `submitGlitch(bytes32 contentHash) returns (uint256 glitchId)` - Submit new glitch, emits GlitchSubmitted
+- `upvote(uint256 glitchId)` - One vote per address per glitch, emits GlitchUpvoted
+- `getGlitch(uint256 glitchId) returns (Glitch memory)` - Retrieve glitch data
+- `getVoteCount(uint256 glitchId) returns (uint256)` - Get vote count
+- `hasUserVoted(uint256 glitchId, address voter) returns (bool)` - Check if user voted
 
 ### Web3 Integration Flow
 
@@ -84,37 +96,8 @@ Key functions:
 
 ## Development Commands
 
-### Smart Contract (Hardhat)
+### Next.js Application (Root Directory)
 
-The Hardhat project should be in the `contracts/` directory with:
-- `contracts/GlitchRegistry.sol` - Main contract
-- `scripts/deploy.ts` - Deployment script
-- `test/glitchRegistry.test.ts` - Contract tests
-- `hardhat.config.ts` - Network configuration (Base Sepolia/mainnet)
-
-**Note**: Commands below assume setup is complete. Configuration requires `.env` with:
-- `BASE_SEPOLIA_RPC_URL`
-- `BASE_MAINNET_RPC_URL`
-- `DEPLOYER_PRIVATE_KEY`
-
-Expected commands (verify actual setup):
-```bash
-# Compile contracts
-npx hardhat compile
-
-# Run tests
-npx hardhat test
-
-# Deploy to Base Sepolia
-npx hardhat run scripts/deploy.ts --network base-sepolia
-
-# Deploy to Base mainnet
-npx hardhat run scripts/deploy.ts --network base-mainnet
-```
-
-### Next.js Application
-
-Expected commands (verify after package.json is created):
 ```bash
 # Install dependencies
 npm install
@@ -122,47 +105,118 @@ npm install
 # Run development server
 npm run dev
 
-# Build for production
+# Build for production (includes Prisma generation)
 npm run build
 
 # Run production build
 npm start
 
+# Linting
+npm run lint
+
 # Type checking
 npx tsc --noEmit
-
-# Linting (if configured)
-npm run lint
 ```
 
-## Key Technical Constraints
+### Database (Prisma)
 
-### Type Safety
-- All code must be TypeScript with no `any` types
-- wagmi and viem provide full type safety for contract interactions
-- Use generated types from Hardhat for contract ABIs
+```bash
+# Generate Prisma Client (runs automatically on postinstall)
+npx prisma generate
 
-### Error Handling
-- Display user-friendly messages for wallet connection failures
-- Handle transaction rejections gracefully ("Transaction was cancelled")
-- Show clear feedback for network switching requirements
+# Create and apply migrations
+npx prisma migrate dev
 
-### Web3 Best Practices
-- Never commit private keys or sensitive data
-- Read `contentHash` from contract to verify data integrity
-- Use wagmi hooks for wallet connection state management
-- Support both Base Sepolia (testnet) and Base mainnet
+# Open Prisma Studio (database GUI)
+npx prisma studio
 
-## Implementation Notes
+# Push schema changes without migration (for prototyping)
+npx prisma db push
 
-The project currently contains only static HTML/CSS files. The implementation should proceed in this order:
+# Reset database (WARNING: deletes all data)
+npx prisma migrate reset
+```
 
-1. **Convert static UI to Next.js components** - Break down HTML into reusable React components
-2. **Set up Hardhat project** - Create contract, tests, and deployment scripts
-3. **Implement API routes** - Create database schema and REST endpoints
-4. **Integrate wagmi + viem** - Connect frontend to smart contract
-5. **End-to-end testing** - Verify submit and vote flows work on testnet
+### Smart Contracts (contracts/ directory)
 
-## Language Note
+The `contracts/` directory is a separate npm project. All contract commands must be run from the `contracts/` directory.
 
-The project specification document (`first.md`) is in Japanese, but all code, comments, and user-facing text should be in English.
+```bash
+cd contracts
+
+# Install contract dependencies
+npm install
+
+# Compile contracts (generates typechain-types/)
+npm run compile
+# Equivalent to: npx hardhat compile
+
+# Run contract tests
+npm test
+# Equivalent to: npx hardhat test
+
+# Deploy to Base Sepolia testnet
+npm run deploy:sepolia
+# Equivalent to: npx hardhat run scripts/deploy.ts --network base-sepolia
+
+# Deploy to Base mainnet
+npm run deploy:mainnet
+# Equivalent to: npx hardhat run scripts/deploy.ts --network base-mainnet
+```
+
+**Environment setup**: Hardhat reads from `../.env` (parent directory) and requires:
+- `BASE_SEPOLIA_RPC_URL` - Base Sepolia RPC endpoint
+- `BASE_MAINNET_RPC_URL` - Base mainnet RPC endpoint
+- `DEPLOYER_PRIVATE_KEY` - Private key for deployment account
+- `BASESCAN_API_KEY` - (Optional) For contract verification
+
+## Important Technical Details
+
+### TypeScript Configuration
+
+The root `tsconfig.json` excludes the `contracts/` directory to avoid conflicts between Next.js and Hardhat TypeScript configurations. The contracts directory has its own `tsconfig.json`.
+
+Path alias `@/*` maps to the root directory for cleaner imports:
+```typescript
+import { prisma } from '@/lib/prisma';
+import { config } from '@/lib/wagmi';
+```
+
+### Web3 Integration
+
+- **wagmi configuration** (`lib/wagmi.ts`): Uses `injected()` connector for MetaMask/WalletConnect
+- **Contract ABI** (`lib/contracts.ts`): Manually defined ABI with `as const` for type safety
+- **Contract address**: Set via `NEXT_PUBLIC_GLITCH_REGISTRY_ADDRESS` environment variable
+- **Supported chains**: Base (chainId 8453) and Base Sepolia (chainId 84532)
+
+### Database
+
+- **ORM**: Prisma v6 (downgraded from v7 for compatibility)
+- **Client singleton** (`lib/prisma.ts`): Prevents multiple Prisma instances in development
+- **Auto-generation**: `prisma generate` runs on `npm install` (postinstall hook) and before build
+
+### Build Configuration
+
+- **Next.js config** (`next.config.ts`): Excludes `contracts/` from TypeScript compilation
+- **Vercel builds**: Prisma generation runs in both postinstall and build scripts to handle Vercel's build environment
+
+### Network Switching
+
+The app automatically switches to Base Sepolia when needed. Contract address environment variable determines which network is used:
+- Deploy contract to desired network
+- Set `NEXT_PUBLIC_GLITCH_REGISTRY_ADDRESS` to deployed address
+- wagmi will connect to the chain where that contract exists
+
+### API Routes
+
+Located in `app/api/glitches/`:
+- `GET /api/glitches` - List recent glitches
+- `POST /api/glitches` - Create glitch (called after blockchain submission)
+- `GET /api/glitches/[id]` - Get single glitch
+
+### Common Development Issues
+
+1. **Prisma not generating**: Run `npx prisma generate` manually if types are missing
+2. **Contract types missing**: Run `npm run compile` in `contracts/` directory to generate TypeChain types
+3. **Environment variables**: Next.js requires `NEXT_PUBLIC_` prefix for client-side env vars
+4. **Hardhat env vars**: Reads from parent directory `../.env`, not from `contracts/.env`

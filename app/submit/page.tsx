@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAccount, useConnect, useWriteContract, useWaitForTransactionReceipt, useSwitchChain, useChainId } from 'wagmi';
-import { keccak256, toBytes } from 'viem';
+import { keccak256, toBytes, decodeEventLog } from 'viem';
 import { baseSepolia } from 'wagmi/chains';
 import Header from '@/components/Header';
 import { glitchRegistryABI, GLITCH_REGISTRY_ADDRESS } from '@/lib/contracts';
@@ -99,7 +99,7 @@ export default function SubmitPage() {
   };
 
   // Wait for transaction and save to database
-  const { isLoading: isConfirming, isSuccess: isConfirmed, isError: isConfirmError, error: confirmError } = useWaitForTransactionReceipt({
+  const { isLoading: isConfirming, isSuccess: isConfirmed, isError: isConfirmError, error: confirmError, data: receipt } = useWaitForTransactionReceipt({
     hash,
   });
 
@@ -114,12 +114,30 @@ export default function SubmitPage() {
 
   // Handle transaction success
   React.useEffect(() => {
-    if (isConfirmed && hash) {
+    if (isConfirmed && hash && receipt) {
       const saveToDatabase = async () => {
         try {
-          // Get the glitch ID from the transaction receipt
-          // For simplicity, we'll assume the next glitch ID
-          // In production, you should parse the event from the receipt
+          // Get the glitch ID from the transaction receipt logs
+          let onchainGlitchId = 0;
+
+          for (const log of receipt.logs) {
+            try {
+              const decoded = decodeEventLog({
+                abi: glitchRegistryABI,
+                data: log.data,
+                topics: log.topics,
+              });
+
+              if (decoded.eventName === 'GlitchSubmitted' && decoded.args) {
+                const args = decoded.args as unknown as { glitchId: bigint };
+                onchainGlitchId = Number(args.glitchId);
+                break;
+              }
+            } catch {
+              // Not our event, continue
+            }
+          }
+
           const formElement = document.querySelector('form') as HTMLFormElement;
           if (!formElement) return;
 
@@ -145,7 +163,7 @@ export default function SubmitPage() {
             body: JSON.stringify({
               ...metadata,
               author_address: address,
-              onchain_glitch_id: 0, // TODO: Get from event log
+              onchain_glitch_id: onchainGlitchId,
               content_hash: contentHash,
             }),
           });
@@ -165,7 +183,7 @@ export default function SubmitPage() {
 
       saveToDatabase();
     }
-  }, [isConfirmed, hash, address, router]);
+  }, [isConfirmed, hash, address, router, receipt]);
 
   React.useEffect(() => {
     if (isPending || isConfirming) {
