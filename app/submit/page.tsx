@@ -14,15 +14,29 @@ export default function SubmitPage() {
   const [error, setError] = useState<string | null>(null);
 
   const { address, isConnected } = useAccount();
-  const { connect, connectors } = useConnect();
+  const { connect, connectors, isPending: isConnecting } = useConnect();
   const { writeContract, data: hash, isPending } = useWriteContract();
   const chainId = useChainId();
   const { switchChain } = useSwitchChain();
 
-  const handleConnect = () => {
-    const connector = connectors[0];
-    if (connector) {
-      connect({ connector });
+  const handleConnect = async () => {
+    try {
+      // Find the injected connector (MetaMask, etc.)
+      const injectedConnector = connectors.find(
+        (connector) => connector.id === 'injected'
+      );
+
+      if (injectedConnector) {
+        await connect({ connector: injectedConnector });
+      } else if (connectors.length > 0) {
+        // Fallback to first available connector
+        await connect({ connector: connectors[0] });
+      } else {
+        setError('No wallet connector available. Please install MetaMask or another Web3 wallet.');
+      }
+    } catch (error) {
+      console.error('Connection error:', error);
+      setError('Failed to connect wallet. Please try again.');
     }
   };
 
@@ -239,8 +253,13 @@ export default function SubmitPage() {
 
           <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {!isConnected ? (
-              <button type="button" className="wallet-button" onClick={handleConnect}>
-                Connect Wallet to Submit
+              <button
+                type="button"
+                className="wallet-button"
+                onClick={handleConnect}
+                disabled={isConnecting}
+              >
+                {isConnecting ? 'Connecting...' : 'Connect Wallet to Submit'}
               </button>
             ) : (
               <div className="wallet-button" style={{ borderStyle: 'solid', cursor: 'default' }}>
