@@ -12,7 +12,7 @@ interface Glitch {
   title: string;
   game_name: string;
   platform: string;
-  video_url: string;
+  video_url: string | null;
   description: string;
   tags: string;
   author_address: string;

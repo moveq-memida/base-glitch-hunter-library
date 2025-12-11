@@ -1,34 +1,20 @@
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlitchCard from '@/components/GlitchCard';
+import { prisma } from '@/lib/prisma';
 
-interface Glitch {
-  id: string | number;
-  title: string;
-  game_name: string;
-  platform: string;
-  video_url: string;
-  description: string;
-  tags: string;
-  author_address: string;
-  onchain_glitch_id: number;
-  content_hash: string;
-  created_at: string;
-  updated_at: string;
-}
+// Force dynamic rendering to always fetch fresh data
+export const dynamic = 'force-dynamic';
 
-async function getGlitches(): Promise<Glitch[]> {
+async function getGlitches() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/glitches?limit=20`, {
-      cache: 'no-store',
+    const glitches = await prisma.glitch.findMany({
+      take: 20,
+      orderBy: {
+        created_at: 'desc',
+      },
     });
-
-    if (!res.ok) {
-      console.error('Failed to fetch glitches');
-      return [];
-    }
-
-    return await res.json();
+    return glitches;
   } catch (error) {
     console.error('Error fetching glitches:', error);
     return [];

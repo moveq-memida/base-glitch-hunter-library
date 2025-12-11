@@ -1,33 +1,19 @@
 import React from 'react';
 import GlitchDetailClient from './GlitchDetailClient';
+import { prisma } from '@/lib/prisma';
 
-// Force dynamic rendering to avoid static generation issues with Turbopack
-export const dynamic = 'force-dynamic';
-
-interface Glitch {
-  id: string | number;
-  title: string;
-  game_name: string;
-  platform: string;
-  video_url: string;
-  description: string;
-  tags: string;
-  author_address: string;
-  onchain_glitch_id: number;
-}
-
-async function getGlitch(id: string): Promise<Glitch | null> {
+async function getGlitch(id: string) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
-    const res = await fetch(`${baseUrl}/api/glitches/${id}`, {
-      cache: 'no-store',
-    });
-
-    if (!res.ok) {
+    const glitchId = parseInt(id, 10);
+    if (isNaN(glitchId)) {
       return null;
     }
 
-    return await res.json();
+    const glitch = await prisma.glitch.findUnique({
+      where: { id: glitchId },
+    });
+
+    return glitch;
   } catch (error) {
     console.error('Error fetching glitch:', error);
     return null;
