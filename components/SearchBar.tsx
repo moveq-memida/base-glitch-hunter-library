@@ -27,7 +27,7 @@ export default function SearchBar() {
       <input
         type="text"
         className="search-bar__input"
-        placeholder="Search by game name or tag..."
+        placeholder="Search by game, platform, or tag..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />

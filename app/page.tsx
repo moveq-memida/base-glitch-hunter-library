@@ -21,6 +21,7 @@ async function getGlitches(query?: string, page: number = 1) {
             { game_name: { contains: query, mode: 'insensitive' as const } },
             { title: { contains: query, mode: 'insensitive' as const } },
             { tags: { contains: query, mode: 'insensitive' as const } },
+            { platform: { contains: query, mode: 'insensitive' as const } },
           ],
         }
       : undefined;
