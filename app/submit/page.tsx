@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAccount, useConnect, useWriteContract, useWaitForTransactionReceipt, useSwitchChain, useChainId } from 'wagmi';
 import { keccak256, toBytes, decodeEventLog } from 'viem';
-import { baseSepolia } from 'wagmi/chains';
+import { base } from 'wagmi/chains';
 import Header from '@/components/Header';
 import { glitchRegistryABI, GLITCH_REGISTRY_ADDRESS } from '@/lib/contracts';
 
@@ -54,13 +54,13 @@ export default function SubmitPage() {
       return;
     }
 
-    // Check if on correct network (Base Sepolia)
-    if (chainId !== baseSepolia.id) {
+    // Check if on correct network (Base mainnet)
+    if (chainId !== base.id) {
       try {
-        await switchChain({ chainId: baseSepolia.id });
+        await switchChain({ chainId: base.id });
       } catch (error) {
         console.error('Network switch error:', error);
-        setError('Please switch to Base Sepolia network in your wallet');
+        setError('Please switch to Base network in your wallet');
         return;
       }
     }
@@ -290,9 +290,9 @@ export default function SubmitPage() {
             </p>
           )}
 
-          {isConnected && chainId !== baseSepolia.id && (
+          {isConnected && chainId !== base.id && (
             <p style={{ color: 'var(--c-warning)', marginTop: '1rem', padding: '0.75rem', backgroundColor: 'rgba(255, 193, 7, 0.1)', borderRadius: '0.5rem' }}>
-              ⚠️ Wrong network detected. Please switch to Base Sepolia to submit glitches.
+              ⚠️ Wrong network detected. Please switch to Base to submit glitches.
             </p>
           )}
 
