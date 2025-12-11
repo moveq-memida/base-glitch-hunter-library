@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export interface GlitchCardData {
   id: string | number;
@@ -6,6 +7,7 @@ export interface GlitchCardData {
   game_name: string;
   platform: string;
   tags: string;
+  video_url?: string | null;
   voteCount?: number;
 }
 
@@ -14,13 +16,42 @@ interface GlitchCardProps {
   compact?: boolean;
 }
 
+function getYouTubeThumbnail(url: string | null | undefined): string | null {
+  if (!url) return null;
+
+  // YouTube patterns: youtube.com/watch?v=ID, youtu.be/ID, youtube.com/embed/ID
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match && match[1]) {
+      return `https://img.youtube.com/vi/${match[1]}/mqdefault.jpg`;
+    }
+  }
+
+  return null;
+}
+
 export default function GlitchCard({ glitch, compact = false }: GlitchCardProps) {
   const tags = glitch.tags ? glitch.tags.split(',').map(tag => tag.trim()) : [];
+  const thumbnailUrl = getYouTubeThumbnail(glitch.video_url);
 
   return (
     <Link href={`/glitch/${glitch.id}`} className={`glitch-card ${compact ? 'glitch-card--compact' : ''}`}>
       <div className="glitch-card__thumb">
-        No Image
+        {thumbnailUrl ? (
+          <Image
+            src={thumbnailUrl}
+            alt={glitch.title}
+            fill
+            sizes="(max-width: 768px) 100vw, 320px"
+            style={{ objectFit: 'cover' }}
+          />
+        ) : (
+          <span>No Video</span>
+        )}
       </div>
       <div className="glitch-card__body">
         <div className="glitch-card__meta">

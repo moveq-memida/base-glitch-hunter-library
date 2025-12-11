@@ -151,6 +151,7 @@ button, input, textarea, select {
 }
 
 .glitch-card__thumb {
+  position: relative;
   width: 100%;
   height: 180px;
   background-color: #2a2a2a;
@@ -160,6 +161,7 @@ button, input, textarea, select {
   color: #444;
   font-weight: 600;
   font-size: 0.875rem;
+  overflow: hidden;
 }
 
 .glitch-card__body {
