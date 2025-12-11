@@ -15,7 +15,7 @@ export default function SubmitPage() {
 
   const { address, isConnected } = useAccount();
   const { connect, connectors, isPending: isConnecting } = useConnect();
-  const { writeContract, data: hash, isPending } = useWriteContract();
+  const { writeContract, data: hash, isPending, error: writeError, reset: resetWrite } = useWriteContract();
   const chainId = useChainId();
   const { switchChain } = useSwitchChain();
 
@@ -99,9 +99,18 @@ export default function SubmitPage() {
   };
 
   // Wait for transaction and save to database
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+  const { isLoading: isConfirming, isSuccess: isConfirmed, isError: isConfirmError, error: confirmError } = useWaitForTransactionReceipt({
     hash,
   });
+
+  // Handle transaction confirmation errors
+  React.useEffect(() => {
+    if (isConfirmError && confirmError) {
+      console.error('Transaction confirmation error:', confirmError);
+      setError('Transaction failed to confirm. Please check your wallet.');
+      setIsSubmitting(false);
+    }
+  }, [isConfirmError, confirmError]);
 
   // Handle transaction success
   React.useEffect(() => {
@@ -163,6 +172,24 @@ export default function SubmitPage() {
       setIsSubmitting(true);
     }
   }, [isPending, isConfirming]);
+
+  // Handle write contract errors
+  React.useEffect(() => {
+    if (writeError) {
+      console.error('Write contract error:', writeError);
+      const errorMessage = writeError.message || 'Transaction failed';
+      // Extract user-friendly message
+      if (errorMessage.includes('User rejected') || errorMessage.includes('user rejected')) {
+        setError('Transaction was cancelled');
+      } else if (errorMessage.includes('insufficient funds')) {
+        setError('Insufficient funds for transaction');
+      } else {
+        setError(`Transaction failed: ${errorMessage.slice(0, 100)}`);
+      }
+      setIsSubmitting(false);
+      resetWrite();
+    }
+  }, [writeError, resetWrite]);
 
   return (
     <div className="page">
