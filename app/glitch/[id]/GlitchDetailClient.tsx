@@ -2,11 +2,13 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useRouter } from 'next/navigation';
+import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from 'wagmi';
+import { base, baseSepolia } from 'wagmi/chains';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlitchCard from '@/components/GlitchCard';
-import { glitchRegistryABI, GLITCH_REGISTRY_ADDRESS } from '@/lib/contracts';
+import { glitchRegistryABI, GLITCH_REGISTRY_ADDRESS, glitchStampABI, GLITCH_STAMP_ADDRESS } from '@/lib/contracts';
 
 interface Glitch {
   id: string | number;
@@ -18,6 +20,9 @@ interface Glitch {
   tags: string;
   author_address: string;
   onchain_glitch_id: number;
+  stamp_hash?: string | null;
+  stamp_tx_hash?: string | null;
+  stamped_at?: string | Date | null;
 }
 
 function getYouTubeEmbedUrl(url: string | null): string | null {
@@ -60,10 +65,25 @@ interface GlitchDetailClientProps {
 }
 
 export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: GlitchDetailClientProps) {
+  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [stampTxHash, setStampTxHash] = useState<string | null>(glitch?.stamp_tx_hash || null);
 
   const { address, isConnected } = useAccount();
-  const { writeContract, data: hash, isPending } = useWriteContract();
+  const chainId = useChainId();
+  const { switchChain } = useSwitchChain();
+
+  const targetChainId = process.env.NEXT_PUBLIC_CHAIN === 'sepolia' ? baseSepolia.id : base.id;
+  const basescanBaseUrl = process.env.NEXT_PUBLIC_CHAIN === 'sepolia' ? 'https://sepolia.basescan.org' : 'https://basescan.org';
+
+  const { writeContract: writeUpvote, data: upvoteWriteTxHash, isPending: isUpvotePending } = useWriteContract();
+  const {
+    writeContract: writeStamp,
+    data: stampWriteTxHash,
+    isPending: isStampPending,
+    error: stampWriteError,
+    reset: resetStampWrite,
+  } = useWriteContract();
 
   // Read vote count from contract
   const { data: voteCount, refetch: refetchVoteCount } = useReadContract({
@@ -111,7 +131,7 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
     }
 
     try {
-      writeContract({
+      writeUpvote({
         address: GLITCH_REGISTRY_ADDRESS,
         abi: glitchRegistryABI,
         functionName: 'upvote',
@@ -125,7 +145,7 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
 
   // Wait for transaction and refetch vote count
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
-    hash,
+    hash: upvoteWriteTxHash,
   });
 
   React.useEffect(() => {
@@ -133,6 +153,97 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
       refetchVoteCount();
     }
   }, [isConfirmed, refetchVoteCount]);
+
+  const handleStamp = async () => {
+    setError(null);
+
+    if (!isConnected || !address) {
+      setError('Please connect your wallet to stamp');
+      return;
+    }
+
+    if (!glitch) {
+      setError('Glitch not found');
+      return;
+    }
+
+    if (!glitch.stamp_hash) {
+      setError('Stamp hash not available for this post');
+      return;
+    }
+
+    if (!GLITCH_STAMP_ADDRESS) {
+      setError('Stamp contract address not configured');
+      return;
+    }
+
+    if (chainId !== targetChainId) {
+      try {
+        await switchChain({ chainId: targetChainId });
+      } catch (switchError) {
+        console.error('Network switch error:', switchError);
+        setError('Please switch to Base network in your wallet');
+        return;
+      }
+    }
+
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
+    const uri = `${baseUrl}/glitch/${glitch.id}`;
+
+    try {
+      writeStamp({
+        address: GLITCH_STAMP_ADDRESS,
+        abi: glitchStampABI,
+        functionName: 'stamp',
+        args: [glitch.stamp_hash as `0x${string}`, uri],
+      });
+    } catch (stampError) {
+      console.error('Stamp error:', stampError);
+      setError('Failed to stamp. Please try again.');
+    }
+  };
+
+  const { isLoading: isStampConfirming, isSuccess: isStampConfirmed } = useWaitForTransactionReceipt({
+    hash: stampWriteTxHash,
+  });
+
+  React.useEffect(() => {
+    if (!isStampConfirmed || !stampWriteTxHash || !glitch) return;
+
+    const confirm = async () => {
+      try {
+        await fetch('/api/stamp/confirm', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            glitchId: glitch.id,
+            txHash: stampWriteTxHash,
+          }),
+        });
+      } catch (confirmError) {
+        console.error('Stamp confirm error:', confirmError);
+      } finally {
+        setStampTxHash(stampWriteTxHash);
+        router.refresh();
+      }
+    };
+
+    confirm();
+  }, [isStampConfirmed, stampWriteTxHash, glitch, router]);
+
+  React.useEffect(() => {
+    if (stampWriteError) {
+      const message = stampWriteError.message || 'Transaction failed';
+      if (message.includes('User rejected') || message.includes('user rejected')) {
+        setError('Transaction was cancelled');
+      } else if (message.includes('Already stamped')) {
+        setError('This post has already been stamped');
+      } else {
+        setError(`Stamp failed: ${message.slice(0, 120)}`);
+      }
+      resetStampWrite();
+    }
+  }, [stampWriteError, resetStampWrite]);
 
   if (!glitch) {
     return (
@@ -213,9 +324,9 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
                 type="button"
                 className="glitch-vote__button"
                 onClick={handleUpvote}
-                disabled={isPending || isConfirming || !!hasVoted || !isConnected}
+                disabled={isUpvotePending || isConfirming || !!hasVoted || !isConnected}
               >
-                {isPending || isConfirming
+                {isUpvotePending || isConfirming
                   ? 'Voting...'
                   : hasVoted
                   ? '✓ Voted'
@@ -227,6 +338,31 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
                 Connect your wallet to upvote
               </p>
             )}
+
+            <section className="glitch-vote" style={{ marginTop: 'var(--sp-sm)' }}>
+              <span className="glitch-vote__count" style={{ fontSize: '1rem' }}>
+                {stampTxHash ? 'Onchain stamped ✅' : 'Not stamped'}
+              </span>
+              {stampTxHash ? (
+                <a
+                  className="glitch-vote__button"
+                  href={`${basescanBaseUrl}/tx/${stampTxHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View Tx
+                </a>
+              ) : (
+                <button
+                  type="button"
+                  className="glitch-vote__button"
+                  onClick={handleStamp}
+                  disabled={!isConnected || !glitch.stamp_hash || !GLITCH_STAMP_ADDRESS || isStampPending || isStampConfirming}
+                >
+                  {isStampPending || isStampConfirming ? 'Stamping...' : 'Stamp on Base'}
+                </button>
+              )}
+            </section>
           </div>
         </section>
 

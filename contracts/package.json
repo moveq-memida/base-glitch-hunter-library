@@ -9,7 +9,9 @@
     "compile": "hardhat compile",
     "test": "hardhat test",
     "deploy:sepolia": "hardhat run scripts/deploy.ts --network base-sepolia",
-    "deploy:mainnet": "hardhat run scripts/deploy.ts --network base-mainnet"
+    "deploy:mainnet": "hardhat run scripts/deploy.ts --network base-mainnet",
+    "deploy:stamp:sepolia": "hardhat run scripts/deploy-stamp.ts --network base-sepolia",
+    "deploy:stamp:mainnet": "hardhat run scripts/deploy-stamp.ts --network base-mainnet"
   },
   "keywords": [],
   "author": "",

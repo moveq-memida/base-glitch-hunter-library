@@ -24,9 +24,15 @@ model Glitch {
   author_address   String
   onchain_glitch_id Int
   content_hash     String
+  // Server-generated keccak256 stamp over canonical payload (see README).
+  stamp_hash       String?
+  // Transaction hash after onchain stamping (Base).
+  stamp_tx_hash    String?
+  stamped_at       DateTime?
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
 
   @@index([onchain_glitch_id])
+  @@unique([stamp_hash])
   @@index([created_at])
 }

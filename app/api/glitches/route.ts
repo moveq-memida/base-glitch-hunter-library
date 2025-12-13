@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { buildStampPayload, computeStampHash } from '@/lib/stamp';
 
 export async function GET(request: NextRequest) {
   try {
@@ -47,6 +48,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const createdAtIso = new Date().toISOString();
+    const stampPayload = buildStampPayload({
+      title,
+      game: game_name,
+      videoUrl: video_url || '',
+      description,
+      createdAtIso,
+      authorIdentifier: author_address,
+    });
+    const stampHash = computeStampHash(stampPayload);
+
     const glitch = await prisma.glitch.create({
       data: {
         title,
@@ -58,6 +70,8 @@ export async function POST(request: NextRequest) {
         author_address,
         onchain_glitch_id,
         content_hash,
+        stamp_hash: stampHash,
+        created_at: new Date(createdAtIso),
       },
     });
 

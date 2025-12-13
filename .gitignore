@@ -47,3 +47,5 @@ lib/generated/
 *.swp
 *.swo
 *~
+
+.vercel

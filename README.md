@@ -111,6 +111,10 @@ npm run deploy:sepolia
 
 # Deploy to Base Mainnet (production)
 npm run deploy:mainnet
+
+# Deploy GlitchStamp (hash stamping)
+npm run deploy:stamp:sepolia
+npm run deploy:stamp:mainnet
 ```
 
 After deployment, copy the contract address to your `.env` file:
@@ -168,6 +172,11 @@ npx prisma studio      # Open Prisma Studio (database GUI)
 5. After transaction confirms, saves metadata to PostgreSQL via API
 6. Redirects to the glitch detail page
 
+### Stamping a Glitch (Hash Only)
+
+For hackathon/demo clarity, each post has a **server-generated** `stamp_hash` (bytes32) that represents the post identity.  
+Users can optionally “stamp” that hash on Base via `GlitchStamp.stamp(hash, uri)`, and the UI shows `Onchain stamped ✅` with a Basescan link.
+
 ### Voting on a Glitch
 
 1. User visits `/glitch/[id]` detail page
@@ -190,11 +199,17 @@ Contract events:
 - `GlitchSubmitted(uint256 indexed glitchId, address indexed author, bytes32 contentHash)`
 - `GlitchUpvoted(uint256 indexed glitchId, address indexed voter)`
 
+The `GlitchStamp` contract on Base handles:
+
+- `stamp(bytes32 hash, string uri)`: Registers the hash once (deduped) and emits `Stamped(hash, author, timestamp, uri)`
+- `getStamp(bytes32 hash)`: Returns `(author, timestamp, uri)`
+
 ## API Endpoints
 
 - `GET /api/glitches` - List recent glitches (max 20)
 - `POST /api/glitches` - Create new glitch record
 - `GET /api/glitches/[id]` - Get single glitch details
+- `POST /api/stamp/confirm` - Save `txHash` for a post (and verifies `Stamped` event when possible)
 
 ## Database Schema
 
@@ -210,10 +225,31 @@ model Glitch {
   author_address   String
   onchain_glitch_id Int
   content_hash     String
+  stamp_hash       String?
+  stamp_tx_hash    String?
+  stamped_at       DateTime?
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
 }
 ```
+
+## Onchain Stamp Hash Format
+
+The stamp hash is computed **on the server** when creating a DB row (`POST /api/glitches`) and stored in `Glitch.stamp_hash`.
+
+Canonical payload (newline-delimited, fixed order):
+
+1. `version=1`
+2. `title=<JSON string>`
+3. `game=<JSON string>`
+4. `videoUrl=<JSON string>`
+5. `description=<JSON string>`
+6. `createdAt=<JSON string (ISO)>`
+7. `authorIdentifier=<JSON string>`
+
+Then:
+
+- `stampHash = keccak256(toBytes(payload))` (see `lib/stamp.ts`)
 
 ## Testing
 
