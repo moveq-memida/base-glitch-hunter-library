@@ -240,12 +240,15 @@ The stamp hash is computed **on the server** when creating a DB row (`POST /api/
 Canonical payload (newline-delimited, fixed order):
 
 1. `version=1`
-2. `title=<JSON string>`
-3. `game=<JSON string>`
-4. `videoUrl=<JSON string>`
-5. `description=<JSON string>`
-6. `createdAt=<JSON string (ISO)>`
-7. `authorIdentifier=<JSON string>`
+2. `title`
+3. `game`
+4. `videoUrl`
+5. `description`
+6. `createdAtISO`
+7. `authorIdentifier` (wallet or fid; empty string if none)
+
+Notes:
+- To keep the payload strictly **7 lines**, line breaks inside each field are normalized as `\n` and then escaped to `\\n` (see `lib/stamp.ts`).
 
 Then:
 

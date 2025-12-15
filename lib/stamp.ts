@@ -11,15 +11,19 @@ export interface StampPayloadInput {
   authorIdentifier: string;
 }
 
+function normalizeField(value: string): string {
+  return value.replace(/\r\n/g, '\n').replace(/\n/g, '\\n');
+}
+
 export function buildStampPayload(input: StampPayloadInput): string {
   return [
     `version=${STAMP_VERSION}`,
-    `title=${JSON.stringify(input.title)}`,
-    `game=${JSON.stringify(input.game)}`,
-    `videoUrl=${JSON.stringify(input.videoUrl)}`,
-    `description=${JSON.stringify(input.description)}`,
-    `createdAt=${JSON.stringify(input.createdAtIso)}`,
-    `authorIdentifier=${JSON.stringify(input.authorIdentifier)}`,
+    normalizeField(input.title),
+    normalizeField(input.game),
+    normalizeField(input.videoUrl),
+    normalizeField(input.description),
+    normalizeField(input.createdAtIso),
+    normalizeField(input.authorIdentifier),
   ].join('\n');
 }
 

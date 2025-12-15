@@ -363,6 +363,28 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
                 </button>
               )}
             </section>
+
+            {glitch.stamp_hash && (
+              <div style={{ marginTop: 'var(--sp-xs)', display: 'flex', gap: 'var(--sp-xs)', alignItems: 'center', flexWrap: 'wrap' }}>
+                <span style={{ color: 'var(--c-text-muted)', fontSize: '0.875rem' }}>stampHash</span>
+                <code style={{ fontSize: '0.75rem', wordBreak: 'break-all' }}>{glitch.stamp_hash}</code>
+                <button
+                  type="button"
+                  className="glitch-vote__button"
+                  style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(glitch.stamp_hash!);
+                    } catch (copyError) {
+                      console.error('Copy error:', copyError);
+                      setError('Failed to copy stamp hash');
+                    }
+                  }}
+                >
+                  Copy
+                </button>
+              </div>
+            )}
           </div>
         </section>
 
