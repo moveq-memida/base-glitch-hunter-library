@@ -9,6 +9,7 @@ export interface GlitchCardData {
   tags: string;
   video_url?: string | null;
   voteCount?: number;
+  stamp_tx_hash?: string | null;
 }
 
 interface GlitchCardProps {
@@ -69,6 +70,11 @@ export default function GlitchCard({ glitch, compact = false }: GlitchCardProps)
         )}
         {glitch.voteCount !== undefined && (
           <div className="glitch-card__vote">▲ {glitch.voteCount} votes</div>
+        )}
+        {glitch.stamp_tx_hash && (
+          <div style={{ marginTop: 'var(--sp-xs)' }}>
+            <span className="tag-badge">Onchain stamped ✅</span>
+          </div>
         )}
       </div>
     </Link>

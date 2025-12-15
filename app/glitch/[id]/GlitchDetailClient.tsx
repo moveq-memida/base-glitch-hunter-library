@@ -363,6 +363,9 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
                 </button>
               )}
             </section>
+            <p style={{ color: 'var(--c-text-muted)', fontSize: '0.875rem', margin: 'var(--sp-xs) 0 0' }}>
+              Stamp = write the post fingerprint (bytes32) to Base mainnet.
+            </p>
 
             {glitch.stamp_hash && (
               <div style={{ marginTop: 'var(--sp-xs)', display: 'flex', gap: 'var(--sp-xs)', alignItems: 'center', flexWrap: 'wrap' }}>

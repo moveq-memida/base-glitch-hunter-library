@@ -33,7 +33,7 @@ export default function SearchBar() {
       />
       {query && (
         <button type="button" className="search-bar__clear" onClick={handleClear}>
-          ×
+          x
         </button>
       )}
       <button type="submit" className="search-bar__button">
@@ -42,3 +42,4 @@ export default function SearchBar() {
     </form>
   );
 }
+

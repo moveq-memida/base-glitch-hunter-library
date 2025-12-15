@@ -94,6 +94,14 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             <br />
             Record the "Glitch" you discovered.
           </p>
+          <div style={{ marginTop: 'var(--sp-sm)', display: 'flex', flexWrap: 'wrap', gap: 'var(--sp-xs)', justifyContent: 'center' }}>
+            <span className="tag-badge">Base mainnet</span>
+            <span className="tag-badge">Onchain museum stamp</span>
+            <span className="tag-badge">bytes32 only</span>
+          </div>
+          <p style={{ color: 'var(--c-text-muted)', margin: 'var(--sp-xs) 0 0' }}>
+            Stamp writes only a fingerprint hash onchain. Content stays offchain.
+          </p>
         </section>
 
         {!q && currentPage === 1 && (
