@@ -27,19 +27,18 @@ export default function SearchBar() {
       <input
         type="text"
         className="search-bar__input"
-        placeholder="Search by game, platform, or tag..."
+        placeholder="ゲーム名 / タグ / 機種で検索..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
       {query && (
         <button type="button" className="search-bar__clear" onClick={handleClear}>
-          x
+          ×
         </button>
       )}
       <button type="submit" className="search-bar__button">
-        Search
+        検索
       </button>
     </form>
   );
 }
-

@@ -25,17 +25,17 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
     <nav className="pagination">
       {currentPage > 1 && (
         <Link href={createPageUrl(currentPage - 1)} className="pagination__link">
-          ← Prev
+          ← 前へ
         </Link>
       )}
 
       <span className="pagination__info">
-        Page {currentPage} of {totalPages}
+        ページ {currentPage} / {totalPages}
       </span>
 
       {currentPage < totalPages && (
         <Link href={createPageUrl(currentPage + 1)} className="pagination__link">
-          Next →
+          次へ →
         </Link>
       )}
     </nav>

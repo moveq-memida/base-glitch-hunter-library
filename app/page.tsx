@@ -102,31 +102,31 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           </div>
           <div style={{ marginTop: 'var(--sp-sm)', display: 'flex', flexWrap: 'wrap', gap: 'var(--sp-xs)', justifyContent: 'center' }}>
             <span className="tag-badge">Base mainnet</span>
-            <span className="tag-badge">Onchain museum stamp</span>
-            <span className="tag-badge">bytes32 only</span>
+            <span className="tag-badge">博物館スタンプ</span>
+            <span className="tag-badge">bytes32だけ</span>
           </div>
         </section>
 
         {!q && currentPage === 1 && (
-          <Suspense fallback={<div style={{ color: 'var(--c-text-muted)' }}>Loading popular glitches...</div>}>
+          <Suspense fallback={<div style={{ color: 'var(--c-text-muted)' }}>人気のバグを読み込み中...</div>}>
             <PopularGlitches glitches={allGlitches} />
           </Suspense>
         )}
 
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div>読み込み中...</div>}>
           <SearchBar />
         </Suspense>
 
         {q && (
           <p style={{ color: 'var(--c-text-muted)', marginBottom: 'var(--sp-md)' }}>
-            Results for "{q}"
+            「{q}」の検索結果
           </p>
         )}
 
         <section className="glitch-list">
           {glitches.length === 0 ? (
             <p style={{ color: 'var(--c-text-muted)', textAlign: 'center' }}>
-              {q ? `No glitches found for "${q}".` : 'No glitches found. Be the first to submit one!'}
+              {q ? `「${q}」に一致する投稿が見つかりませんでした。` : 'まだ投稿がありません。最初の1件を投稿しよう。'}
             </p>
           ) : (
             glitches.map((glitch) => (

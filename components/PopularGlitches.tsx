@@ -75,8 +75,8 @@ export default function PopularGlitches({ glitches }: PopularGlitchesProps) {
   if (isLoading) {
     return (
       <section className="popular-section">
-        <h3 className="popular-section__title">Popular Glitches</h3>
-        <p style={{ color: 'var(--c-text-muted)' }}>Loading...</p>
+        <h3 className="popular-section__title">人気のバグ</h3>
+        <p style={{ color: 'var(--c-text-muted)' }}>読み込み中...</p>
       </section>
     );
   }
@@ -87,13 +87,13 @@ export default function PopularGlitches({ glitches }: PopularGlitchesProps) {
 
   return (
     <section className="popular-section">
-      <h3 className="popular-section__title">Popular Glitches</h3>
+      <h3 className="popular-section__title">人気のバグ</h3>
       <div className="popular-section__list">
         {sortedGlitches.map((glitch, index) => (
           <div key={glitch.id} className="popular-section__item">
             <div className="popular-section__item-header">
               <span className="popular-section__rank">#{index + 1}</span>
-              <span className="popular-section__votes">▲ {glitch.voteCount}</span>
+              <span className="popular-section__votes">▲ {glitch.voteCount} 票</span>
             </div>
             <GlitchCard glitch={glitch} compact />
           </div>

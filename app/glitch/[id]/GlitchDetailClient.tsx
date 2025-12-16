@@ -111,22 +111,22 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
     setError(null);
 
     if (!isConnected || !address) {
-      setError('Please connect your wallet to upvote');
+      setError('投票するにはウォレット接続が必要です。');
       return;
     }
 
     if (!glitch) {
-      setError('Glitch not found');
+      setError('投稿が見つかりません。');
       return;
     }
 
     if (!GLITCH_REGISTRY_ADDRESS) {
-      setError('Contract address not configured');
+      setError('コントラクトが未設定です。');
       return;
     }
 
     if (hasVoted) {
-      setError('You have already voted for this glitch');
+      setError('この投稿には投票済みです。');
       return;
     }
 
@@ -139,7 +139,7 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
       });
     } catch (error) {
       console.error('Upvote error:', error);
-      setError('Failed to upvote. Please try again.');
+      setError('投票に失敗しました。もう一度お試しください。');
     }
   };
 
@@ -158,22 +158,22 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
     setError(null);
 
     if (!isConnected || !address) {
-      setError('Please connect your wallet to stamp');
+      setError('スタンプするにはウォレット接続が必要です。');
       return;
     }
 
     if (!glitch) {
-      setError('Glitch not found');
+      setError('投稿が見つかりません。');
       return;
     }
 
     if (!glitch.stamp_hash) {
-      setError('Stamp hash not available for this post');
+      setError('この投稿のstampHashがまだ生成されていません。');
       return;
     }
 
     if (!GLITCH_STAMP_ADDRESS) {
-      setError('Stamp contract address not configured');
+      setError('スタンプ用コントラクトが未設定です。');
       return;
     }
 
@@ -182,7 +182,7 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
         await switchChain({ chainId: targetChainId });
       } catch (switchError) {
         console.error('Network switch error:', switchError);
-        setError('Please switch to Base network in your wallet');
+        setError('ウォレットをBase mainnetに切り替えてください。');
         return;
       }
     }
@@ -199,7 +199,7 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
       });
     } catch (stampError) {
       console.error('Stamp error:', stampError);
-      setError('Failed to stamp. Please try again.');
+      setError('スタンプに失敗しました。もう一度お試しください。');
     }
   };
 
@@ -235,11 +235,11 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
     if (stampWriteError) {
       const message = stampWriteError.message || 'Transaction failed';
       if (message.includes('User rejected') || message.includes('user rejected')) {
-        setError('Transaction was cancelled');
+        setError('トランザクションがキャンセルされました。');
       } else if (message.includes('Already stamped')) {
-        setError('This post has already been stamped');
+        setError('この投稿は既にスタンプ済みです。');
       } else {
-        setError(`Stamp failed: ${message.slice(0, 120)}`);
+        setError(`スタンプに失敗しました: ${message.slice(0, 120)}`);
       }
       resetStampWrite();
     }
@@ -250,9 +250,9 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
       <div className="page">
         <Header />
         <main className="page-main">
-          <p>Glitch not found</p>
+          <p>投稿が見つかりません。</p>
           <Link href="/" className="page-back-link">
-            Back to list
+            一覧に戻る
           </Link>
         </main>
         <Footer />
@@ -267,15 +267,15 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
       <Header />
       <main className="page-main">
         <Link href="/" className="page-back-link">
-          Back to list
+          一覧に戻る
         </Link>
 
         <h1 className="glitch-detail__title">{glitch.title}</h1>
 
         <div className="glitch-meta">
-          <span>Game: {glitch.game_name}</span>
-          <span>Platform: {glitch.platform}</span>
-          <span>Hunter: {glitch.author_address}</span>
+          <span>ゲーム: {glitch.game_name}</span>
+          <span>機種: {glitch.platform}</span>
+          <span>発見者: {glitch.author_address}</span>
         </div>
 
         <section className="glitch-content">
@@ -292,7 +292,7 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
                   allowFullScreen
                 />
               ) : (
-                <span>No Video</span>
+                <span>動画なし</span>
               )}
             </div>
           </div>
@@ -327,21 +327,21 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
                 disabled={isUpvotePending || isConfirming || !!hasVoted || !isConnected}
               >
                 {isUpvotePending || isConfirming
-                  ? 'Voting...'
+                  ? '投票中...'
                   : hasVoted
-                  ? '✓ Voted'
-                  : '▲ Upvote'}
+                  ? '投票済み'
+                  : '▲ 投票'}
               </button>
             </section>
             {!isConnected && (
               <p style={{ fontSize: '0.875rem', color: 'var(--c-text-muted)', marginTop: '0.5rem' }}>
-                Connect your wallet to upvote
+                投票するにはウォレット接続が必要です。
               </p>
             )}
 
             <section className="glitch-vote" style={{ marginTop: 'var(--sp-sm)' }}>
               <span className="glitch-vote__count" style={{ fontSize: '1rem' }}>
-                {stampTxHash ? 'Onchain stamped ✅' : 'Not stamped'}
+                {stampTxHash ? 'オンチェーン封印済み ✅' : '未スタンプ'}
               </span>
               {stampTxHash ? (
                 <a
@@ -350,7 +350,7 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  View Tx
+                  Txを見る
                 </a>
               ) : (
                 <button
@@ -359,12 +359,12 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
                   onClick={handleStamp}
                   disabled={!isConnected || !glitch.stamp_hash || !GLITCH_STAMP_ADDRESS || isStampPending || isStampConfirming}
                 >
-                  {isStampPending || isStampConfirming ? 'Stamping...' : 'Stamp on Base'}
+                  {isStampPending || isStampConfirming ? 'スタンプ中...' : 'Baseにスタンプ'}
                 </button>
               )}
             </section>
             <p style={{ color: 'var(--c-text-muted)', fontSize: '0.875rem', margin: 'var(--sp-xs) 0 0' }}>
-              Stamp = write the post fingerprint (bytes32) to Base mainnet.
+              スタンプ = 投稿の指紋（bytes32）だけをBase mainnetに刻みます。
             </p>
 
             {glitch.stamp_hash && (
@@ -380,11 +380,11 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
                       await navigator.clipboard.writeText(glitch.stamp_hash!);
                     } catch (copyError) {
                       console.error('Copy error:', copyError);
-                      setError('Failed to copy stamp hash');
+                      setError('stampHashのコピーに失敗しました。');
                     }
                   }}
                 >
-                  Copy
+                  コピー
                 </button>
               </div>
             )}
@@ -393,7 +393,7 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
 
         {relatedGlitches.length > 0 && (
           <section className="glitch-related">
-            <h3 className="glitch-related__title">More from {glitch.game_name}</h3>
+            <h3 className="glitch-related__title">{glitch.game_name} の他のバグ</h3>
             <div className="glitch-list">
               {relatedGlitches.map((related) => (
                 <GlitchCard key={related.id} glitch={related} compact />

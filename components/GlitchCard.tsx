@@ -51,7 +51,7 @@ export default function GlitchCard({ glitch, compact = false }: GlitchCardProps)
             style={{ objectFit: 'cover' }}
           />
         ) : (
-          <span>No Video</span>
+          <span>動画なし</span>
         )}
       </div>
       <div className="glitch-card__body">
@@ -69,11 +69,11 @@ export default function GlitchCard({ glitch, compact = false }: GlitchCardProps)
           </div>
         )}
         {glitch.voteCount !== undefined && (
-          <div className="glitch-card__vote">▲ {glitch.voteCount} votes</div>
+          <div className="glitch-card__vote">▲ {glitch.voteCount} 票</div>
         )}
         {glitch.stamp_tx_hash && (
           <div style={{ marginTop: 'var(--sp-xs)' }}>
-            <span className="tag-badge">Onchain stamped ✅</span>
+            <span className="tag-badge">オンチェーン封印済み ✅</span>
           </div>
         )}
       </div>

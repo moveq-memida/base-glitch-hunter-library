@@ -8,7 +8,7 @@ interface HeaderProps {
   actionHref?: string;
 }
 
-export default function Header({ actionText = 'Submit Glitch', actionHref = '/submit' }: HeaderProps) {
+export default function Header({ actionText = '投稿する', actionHref = '/submit' }: HeaderProps) {
   const { address, isConnected } = useAccount();
   const { connect, connectors, isPending } = useConnect();
   const { disconnect } = useDisconnect();
@@ -32,7 +32,7 @@ export default function Header({ actionText = 'Submit Glitch', actionHref = '/su
           <button
             className="wallet-button wallet-button--connected"
             onClick={() => disconnect()}
-            title="Click to disconnect"
+            title="クリックで切断"
           >
             {address?.slice(0, 6)}...{address?.slice(-4)}
           </button>
@@ -42,7 +42,7 @@ export default function Header({ actionText = 'Submit Glitch', actionHref = '/su
             onClick={handleConnect}
             disabled={isPending}
           >
-            {isPending ? 'Connecting...' : 'Connect'}
+            {isPending ? '接続中...' : 'ウォレット接続'}
           </button>
         )}
         <Link href={actionHref} className="page-header__action">

@@ -32,11 +32,11 @@ export default function SubmitPage() {
         // Fallback to first available connector
         await connect({ connector: connectors[0] });
       } else {
-        setError('No wallet connector available. Please install MetaMask or another Web3 wallet.');
+        setError('ウォレットが見つかりません。MetaMaskなどをインストールしてください。');
       }
     } catch (error) {
       console.error('Connection error:', error);
-      setError('Failed to connect wallet. Please try again.');
+      setError('ウォレット接続に失敗しました。もう一度お試しください。');
     }
   };
 
@@ -45,12 +45,12 @@ export default function SubmitPage() {
     setError(null);
 
     if (!isConnected || !address) {
-      setError('Please connect your wallet first');
+      setError('まずウォレットを接続してください。');
       return;
     }
 
     if (!GLITCH_REGISTRY_ADDRESS) {
-      setError('Contract address not configured. Please deploy the contract first.');
+      setError('コントラクトが未設定です。');
       return;
     }
 
@@ -60,7 +60,7 @@ export default function SubmitPage() {
         await switchChain({ chainId: base.id });
       } catch (error) {
         console.error('Network switch error:', error);
-        setError('Please switch to Base network in your wallet');
+        setError('ウォレットをBase mainnetに切り替えてください。');
         return;
       }
     }
@@ -93,7 +93,7 @@ export default function SubmitPage() {
       // Note: Transaction handling continues in useEffect below
     } catch (error) {
       console.error('Submit error:', error);
-      setError('Failed to submit glitch. Please try again.');
+      setError('送信に失敗しました。もう一度お試しください。');
       setIsSubmitting(false);
     }
   };
@@ -107,7 +107,7 @@ export default function SubmitPage() {
   React.useEffect(() => {
     if (isConfirmError && confirmError) {
       console.error('Transaction confirmation error:', confirmError);
-      setError('Transaction failed to confirm. Please check your wallet.');
+      setError('トランザクションの確定に失敗しました。ウォレットを確認してください。');
       setIsSubmitting(false);
     }
   }, [isConfirmError, confirmError]);
@@ -176,7 +176,7 @@ export default function SubmitPage() {
           router.push(`/glitch/${savedGlitch.id}`);
         } catch (error) {
           console.error('Database save error:', error);
-          setError('Glitch submitted on-chain, but failed to save to database');
+          setError('オンチェーンへの投稿は完了しましたが、DB保存に失敗しました。');
           setIsSubmitting(false);
         }
       };
@@ -198,11 +198,11 @@ export default function SubmitPage() {
       const errorMessage = writeError.message || 'Transaction failed';
       // Extract user-friendly message
       if (errorMessage.includes('User rejected') || errorMessage.includes('user rejected')) {
-        setError('Transaction was cancelled');
+        setError('トランザクションがキャンセルされました。');
       } else if (errorMessage.includes('insufficient funds')) {
-        setError('Insufficient funds for transaction');
+        setError('ガス代が不足しています。');
       } else {
-        setError(`Transaction failed: ${errorMessage.slice(0, 100)}`);
+        setError(`トランザクションに失敗しました: ${errorMessage.slice(0, 100)}`);
       }
       setIsSubmitting(false);
       resetWrite();
@@ -211,38 +211,38 @@ export default function SubmitPage() {
 
   return (
     <div className="page">
-      <Header actionText="Cancel" actionHref="/" />
+      <Header actionText="戻る" actionHref="/" />
       <main className="page-main">
-        <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Submit a new glitch</h2>
+        <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>バグを投稿する</h2>
         <p style={{ color: 'var(--c-text-muted)', marginBottom: '2rem' }}>
-          Add a discovered glitch to the library. Please include detailed reproduction steps.
+          発見したバグを登録します。再現手順があると強いです。
         </p>
 
         <form className="glitch-form" onSubmit={handleSubmit}>
           <div className="glitch-form__field">
-            <label htmlFor="title">Title</label>
+            <label htmlFor="title">タイトル</label>
             <input
               type="text"
               id="title"
               name="title"
-              placeholder="e.g. Rolling into the wall causes falling"
+              placeholder="例：壁に当たり続けると落下する"
               required
             />
           </div>
 
           <div className="glitch-form__field">
-            <label htmlFor="game">Game Name</label>
+            <label htmlFor="game">ゲーム名</label>
             <input
               type="text"
               id="game"
               name="game"
-              placeholder="e.g. Elden Ring"
+              placeholder="例：ポケモン ダイヤモンド / パール"
               required
             />
           </div>
 
           <div className="glitch-form__field">
-            <label htmlFor="platform">Platform</label>
+            <label htmlFor="platform">機種</label>
             <select id="platform" name="platform">
               <option value="pc">PC / Steam</option>
               <option value="ps5">PlayStation 5</option>
@@ -254,7 +254,7 @@ export default function SubmitPage() {
           </div>
 
           <div className="glitch-form__field">
-            <label htmlFor="video">Video URL (YouTube/Twitch)</label>
+            <label htmlFor="video">動画URL（YouTubeなど）</label>
             <input
               type="url"
               id="video"
@@ -264,23 +264,23 @@ export default function SubmitPage() {
           </div>
 
           <div className="glitch-form__field">
-            <label htmlFor="description">Description & Reproduction Steps</label>
+            <label htmlFor="description">説明・再現手順</label>
             <textarea
               id="description"
               name="description"
               rows={6}
-              placeholder="1. Go to the specific cliff&#10;2. Use the item...&#10;3. ..."
+              placeholder="1. 〜へ行く\n2. 〜をする\n3. 〜になる"
               required
             />
           </div>
 
           <div className="glitch-form__field">
-            <label htmlFor="tags">Tags</label>
+            <label htmlFor="tags">タグ</label>
             <input
               type="text"
               id="tags"
               name="tags"
-              placeholder="physics, out-of-bounds, softlock"
+              placeholder="例：pokemon,void,glitch"
             />
           </div>
 
@@ -292,7 +292,7 @@ export default function SubmitPage() {
 
           {isConnected && chainId !== base.id && (
             <p style={{ color: 'var(--c-warning)', marginTop: '1rem', padding: '0.75rem', backgroundColor: 'rgba(255, 193, 7, 0.1)', borderRadius: '0.5rem' }}>
-              ⚠️ Wrong network detected. Please switch to Base to submit glitches.
+              ⚠️ ネットワークがBaseではありません。Base mainnetに切り替えてください。
             </p>
           )}
 
@@ -304,16 +304,16 @@ export default function SubmitPage() {
                 onClick={handleConnect}
                 disabled={isConnecting}
               >
-                {isConnecting ? 'Connecting...' : 'Connect Wallet to Submit'}
+                {isConnecting ? '接続中...' : 'ウォレットを接続して投稿'}
               </button>
             ) : (
               <div className="wallet-button" style={{ borderStyle: 'solid', cursor: 'default' }}>
-                Connected: {address?.slice(0, 6)}...{address?.slice(-4)}
+                接続中: {address?.slice(0, 6)}...{address?.slice(-4)}
               </div>
             )}
 
             <button type="submit" className="glitch-form__submit" disabled={isSubmitting || !isConnected}>
-              {isSubmitting ? 'Submitting...' : 'Submit Glitch'}
+              {isSubmitting ? '送信中...' : '投稿する'}
             </button>
           </div>
         </form>
