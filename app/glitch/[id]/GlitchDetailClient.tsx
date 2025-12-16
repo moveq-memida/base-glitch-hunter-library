@@ -339,8 +339,15 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
               </p>
             )}
 
-            <section className="glitch-vote" style={{ marginTop: 'var(--sp-sm)' }}>
-              <span className="glitch-vote__count" style={{ fontSize: '1rem' }}>
+            <section className="glitch-vote" style={{ marginTop: 'var(--sp-sm)', flexWrap: 'wrap', gap: 'var(--sp-sm)' }}>
+              <span
+                className="tag-badge"
+                style={{
+                  borderColor: stampTxHash ? 'var(--c-success)' : 'var(--c-border)',
+                  color: stampTxHash ? 'var(--c-success)' : 'var(--c-text-muted)',
+                  fontSize: '0.875rem',
+                }}
+              >
                 {stampTxHash ? 'オンチェーン封印済み ✅' : '未スタンプ'}
               </span>
               {stampTxHash ? (
@@ -349,6 +356,7 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
                   href={`${basescanBaseUrl}/tx/${stampTxHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  style={{ whiteSpace: 'nowrap' }}
                 >
                   Txを見る
                 </a>
@@ -358,13 +366,14 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
                   className="glitch-vote__button"
                   onClick={handleStamp}
                   disabled={!isConnected || !glitch.stamp_hash || !GLITCH_STAMP_ADDRESS || isStampPending || isStampConfirming}
+                  style={{ whiteSpace: 'nowrap' }}
                 >
                   {isStampPending || isStampConfirming ? 'スタンプ中...' : 'Baseにスタンプ'}
                 </button>
               )}
             </section>
             <p style={{ color: 'var(--c-text-muted)', fontSize: '0.875rem', margin: 'var(--sp-xs) 0 0' }}>
-              スタンプ = 投稿の指紋（bytes32）だけをBase mainnetに刻みます。
+              スタンプすると、この投稿の「指紋ハッシュ（bytes32）」だけがBaseに残ります。本文や動画は載りません。
             </p>
 
             {glitch.stamp_hash && (
