@@ -88,20 +88,23 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       <Header />
       <main className="page-main">
         <section className="page-intro">
-          <h2 className="page-intro__title">Archive the Broken</h2>
+          <h2 className="page-intro__title">バグの博物館</h2>
           <p className="page-intro__desc">
-            A library collecting bugs, exploits, and odd behaviors hidden in games worldwide.
-            <br />
-            Record the "Glitch" you discovered.
+            投稿の指紋（bytes32）だけを Base mainnet に刻む。
+            <br />内容や動画はオフチェーンのまま。
           </p>
+          <div style={{ marginTop: 'var(--sp-sm)', display: 'flex', flexWrap: 'wrap', gap: 'var(--sp-xs)', justifyContent: 'center', alignItems: 'center' }}>
+            <span className="tag-badge">投稿</span>
+            <span style={{ color: 'var(--c-text-muted)' }}>→</span>
+            <span className="tag-badge">Stamp</span>
+            <span style={{ color: 'var(--c-text-muted)' }}>→</span>
+            <span className="tag-badge">basescanで検証/共有</span>
+          </div>
           <div style={{ marginTop: 'var(--sp-sm)', display: 'flex', flexWrap: 'wrap', gap: 'var(--sp-xs)', justifyContent: 'center' }}>
             <span className="tag-badge">Base mainnet</span>
             <span className="tag-badge">Onchain museum stamp</span>
             <span className="tag-badge">bytes32 only</span>
           </div>
-          <p style={{ color: 'var(--c-text-muted)', margin: 'var(--sp-xs) 0 0' }}>
-            Stamp writes only a fingerprint hash onchain. Content stays offchain.
-          </p>
         </section>
 
         {!q && currentPage === 1 && (
