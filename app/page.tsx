@@ -99,6 +99,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       ? glitches.find((g) => `${g.title} ${g.game_name}`.includes('なぞのばしょ')) || glitches[0]
       : null;
 
+  const displayGlitches =
+    !q && currentPage === 1 && featured
+      ? glitches.filter((g) => g.id !== featured.id)
+      : glitches;
+
   return (
     <div className="page">
       <MiniKitReady />
@@ -131,8 +136,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         {!q && currentPage === 1 && featured && (
           <section style={{ marginBottom: 'var(--sp-lg)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--sp-sm)' }}>
-              <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--c-text-muted)' }}>Featured Glitch</h3>
-              <span className="tag-badge">Top 1</span>
+              <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--c-text-muted)' }}>
+                {prefersJa ? 'ピックアップ' : 'Featured Glitch'}
+              </h3>
+              <span className="tag-badge">{prefersJa ? '注目' : 'Top 1'}</span>
             </div>
             <GlitchCard glitch={featured} />
           </section>
@@ -154,13 +161,19 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           </p>
         )}
 
+        {displayGlitches.length > 0 && (
+          <h3 style={{ margin: '0 0 var(--sp-sm)', fontSize: '1rem', color: 'var(--c-text-muted)' }}>
+            {q ? (prefersJa ? '検索結果' : 'Results') : (prefersJa ? '新着' : 'Latest')}
+          </h3>
+        )}
+
         <section className="glitch-list">
-          {glitches.length === 0 ? (
+          {displayGlitches.length === 0 ? (
             <p style={{ color: 'var(--c-text-muted)', textAlign: 'center' }}>
               {q ? `「${q}」に一致する投稿が見つかりませんでした。` : 'まだ投稿がありません。最初の1件を投稿しよう。'}
             </p>
           ) : (
-            glitches.map((glitch) => (
+            displayGlitches.map((glitch) => (
               <GlitchCard key={glitch.id} glitch={glitch} />
             ))
           )}
