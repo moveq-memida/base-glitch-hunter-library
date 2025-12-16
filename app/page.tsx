@@ -136,10 +136,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         {!q && currentPage === 1 && featured && (
           <section style={{ marginBottom: 'var(--sp-lg)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--sp-sm)' }}>
-              <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--c-text-muted)' }}>
-                {prefersJa ? 'ピックアップ' : 'Featured Glitch'}
-              </h3>
-              <span className="tag-badge">{prefersJa ? '注目' : 'Top 1'}</span>
+              <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--c-text-muted)' }}>ピックアップ</h3>
+              <span className="tag-badge">注目</span>
             </div>
             <GlitchCard glitch={featured} />
           </section>
@@ -161,16 +159,20 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           </p>
         )}
 
-        {displayGlitches.length > 0 && (
+        {(q || displayGlitches.length > 0 || (!q && currentPage === 1 && !!featured)) && (
           <h3 style={{ margin: '0 0 var(--sp-sm)', fontSize: '1rem', color: 'var(--c-text-muted)' }}>
-            {q ? (prefersJa ? '検索結果' : 'Results') : (prefersJa ? '新着' : 'Latest')}
+            {q ? '検索結果' : '新着'}
           </h3>
         )}
 
         <section className="glitch-list">
           {displayGlitches.length === 0 ? (
             <p style={{ color: 'var(--c-text-muted)', textAlign: 'center' }}>
-              {q ? `「${q}」に一致する投稿が見つかりませんでした。` : 'まだ投稿がありません。最初の1件を投稿しよう。'}
+              {q
+                ? `「${q}」に一致する投稿が見つかりませんでした。`
+                : featured
+                ? '他の新着はまだありません。'
+                : 'まだ投稿がありません。最初の1件を投稿しよう。'}
             </p>
           ) : (
             displayGlitches.map((glitch) => (
