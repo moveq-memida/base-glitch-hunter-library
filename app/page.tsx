@@ -7,6 +7,8 @@ import PopularGlitches from '@/components/PopularGlitches';
 import { MiniKitReady } from '@/components/MiniKitReady';
 import { prisma } from '@/lib/prisma';
 import { Suspense } from 'react';
+import { headers } from 'next/headers';
+import RandomGlitchButton from '@/components/RandomGlitchButton';
 
 // Force dynamic rendering to always fetch fresh data
 export const dynamic = 'force-dynamic';
@@ -75,12 +77,27 @@ interface HomePageProps {
 }
 
 export default async function HomePage({ searchParams }: HomePageProps) {
+  const acceptLanguage = (await headers()).get('accept-language') || '';
+  const prefersJa = !acceptLanguage || acceptLanguage.toLowerCase().includes('ja');
   const { q, page } = await searchParams;
   const currentPage = Math.max(1, parseInt(page || '1', 10));
   const [{ glitches, totalPages }, allGlitches] = await Promise.all([
     getGlitches(q, currentPage),
     getAllGlitchesForRanking(),
   ]);
+
+  const primaryLine = prefersJa
+    ? '伝説のゲームバグを投稿して、みんなで投票。気に入った投稿はBaseに“刻める”。'
+    : 'Post legendary game glitches, upvote, and stamp them on Base.';
+
+  const secondaryLine = prefersJa
+    ? 'Post legendary game glitches, upvote, and stamp them on Base.'
+    : '伝説のゲームバグを投稿して、みんなで投票。気に入った投稿はBaseに“刻める”。';
+
+  const featured =
+    !q && currentPage === 1
+      ? glitches.find((g) => `${g.title} ${g.game_name}`.includes('なぞのばしょ')) || glitches[0]
+      : null;
 
   return (
     <div className="page">
@@ -90,22 +107,36 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         <section className="page-intro">
           <h2 className="page-intro__title">バグの博物館</h2>
           <p className="page-intro__desc">
-            投稿の指紋（bytes32）だけを Base mainnet に刻む。
-            <br />内容や動画はオフチェーンのまま。
+            {primaryLine}
+            <br />
+            <span style={{ fontSize: '0.875rem' }}>{secondaryLine}</span>
           </p>
           <div style={{ marginTop: 'var(--sp-sm)', display: 'flex', flexWrap: 'wrap', gap: 'var(--sp-xs)', justifyContent: 'center', alignItems: 'center' }}>
-            <span className="tag-badge">投稿</span>
-            <span style={{ color: 'var(--c-text-muted)' }}>→</span>
-            <span className="tag-badge">Stamp</span>
-            <span style={{ color: 'var(--c-text-muted)' }}>→</span>
-            <span className="tag-badge">basescanで検証/共有</span>
+            <span className="tag-badge">① Browse</span>
+            <span className="tag-badge">② Post</span>
+            <span className="tag-badge">③ Stamp on Base</span>
           </div>
           <div style={{ marginTop: 'var(--sp-sm)', display: 'flex', flexWrap: 'wrap', gap: 'var(--sp-xs)', justifyContent: 'center' }}>
             <span className="tag-badge">Base mainnet</span>
             <span className="tag-badge">博物館スタンプ</span>
             <span className="tag-badge">bytes32だけ</span>
           </div>
+          {!q && currentPage === 1 && allGlitches.length > 0 && (
+            <div style={{ marginTop: 'var(--sp-sm)' }}>
+              <RandomGlitchButton ids={allGlitches.map((g) => g.id)} />
+            </div>
+          )}
         </section>
+
+        {!q && currentPage === 1 && featured && (
+          <section style={{ marginBottom: 'var(--sp-lg)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--sp-sm)' }}>
+              <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--c-text-muted)' }}>Featured Glitch</h3>
+              <span className="tag-badge">Top 1</span>
+            </div>
+            <GlitchCard glitch={featured} />
+          </section>
+        )}
 
         {!q && currentPage === 1 && (
           <Suspense fallback={<div style={{ color: 'var(--c-text-muted)' }}>人気のバグを読み込み中...</div>}>

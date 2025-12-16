@@ -38,6 +38,7 @@ function getYouTubeThumbnail(url: string | null | undefined): string | null {
 export default function GlitchCard({ glitch, compact = false }: GlitchCardProps) {
   const tags = glitch.tags ? glitch.tags.split(',').map(tag => tag.trim()) : [];
   const thumbnailUrl = getYouTubeThumbnail(glitch.video_url);
+  const stampTxUrl = glitch.stamp_tx_hash ? `https://basescan.org/tx/${glitch.stamp_tx_hash}` : null;
 
   return (
     <Link href={`/glitch/${glitch.id}`} className={`glitch-card ${compact ? 'glitch-card--compact' : ''}`}>
@@ -58,7 +59,40 @@ export default function GlitchCard({ glitch, compact = false }: GlitchCardProps)
         <div className="glitch-card__meta">
           {glitch.game_name} / {glitch.platform}
         </div>
-        <h3 className="glitch-card__title">{glitch.title}</h3>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--sp-xs)' }}>
+          <h3 className="glitch-card__title" style={{ margin: 0, minWidth: 0 }}>
+            {glitch.title}
+          </h3>
+          {stampTxUrl && (
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', whiteSpace: 'nowrap' }}>
+              <span className="tag-badge" style={{ borderColor: 'var(--c-success)', color: 'var(--c-success)' }}>
+                ✅ Stamped
+              </span>
+              <span
+                className="tag-badge"
+                role="link"
+                tabIndex={0}
+                style={{ cursor: 'pointer' }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  window.open(stampTxUrl, '_blank', 'noopener,noreferrer');
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.open(stampTxUrl, '_blank', 'noopener,noreferrer');
+                  }
+                }}
+                aria-label="Tx on BaseScan"
+                title="Tx on BaseScan"
+              >
+                Tx
+              </span>
+            </span>
+          )}
+        </div>
         {tags.length > 0 && (
           <div className="glitch-card__tags">
             {tags.map((tag, index) => (
@@ -70,11 +104,6 @@ export default function GlitchCard({ glitch, compact = false }: GlitchCardProps)
         )}
         {glitch.voteCount !== undefined && (
           <div className="glitch-card__vote">▲ {glitch.voteCount} 票</div>
-        )}
-        {glitch.stamp_tx_hash && (
-          <div style={{ marginTop: 'var(--sp-xs)' }}>
-            <span className="tag-badge">オンチェーン封印済み ✅</span>
-          </div>
         )}
       </div>
     </Link>
