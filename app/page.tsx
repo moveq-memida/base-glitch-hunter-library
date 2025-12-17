@@ -7,7 +7,6 @@ import PopularGlitches from '@/components/PopularGlitches';
 import { MiniKitReady } from '@/components/MiniKitReady';
 import { prisma } from '@/lib/prisma';
 import { Suspense } from 'react';
-import { headers } from 'next/headers';
 import RandomGlitchButton from '@/components/RandomGlitchButton';
 
 // Force dynamic rendering to always fetch fresh data
@@ -77,8 +76,6 @@ interface HomePageProps {
 }
 
 export default async function HomePage({ searchParams }: HomePageProps) {
-  const acceptLanguage = (await headers()).get('accept-language') || '';
-  const prefersJa = !acceptLanguage || acceptLanguage.toLowerCase().includes('ja');
   const { q, page } = await searchParams;
   const currentPage = Math.max(1, parseInt(page || '1', 10));
   const [{ glitches, totalPages }, allGlitches] = await Promise.all([
@@ -86,13 +83,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     getAllGlitchesForRanking(),
   ]);
 
-  const primaryLine = prefersJa
-    ? '伝説のゲームバグを投稿して、みんなで投票。気に入った投稿はBaseに“刻める”。'
-    : 'Post legendary game glitches, upvote, and stamp them on Base.';
-
-  const secondaryLine = prefersJa
-    ? 'Post legendary game glitches, upvote, and stamp them on Base.'
-    : '伝説のゲームバグを投稿して、みんなで投票。気に入った投稿はBaseに“刻める”。';
+  const primaryLine = '伝説のゲームバグを投稿して、みんなで投票。気に入った投稿はBaseに“刻める”。';
 
   const featured =
     !q && currentPage === 1
@@ -111,20 +102,14 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       <main className="page-main">
         <section className="page-intro">
           <h2 className="page-intro__title">バグの博物館</h2>
-          <p className="page-intro__desc">
-            {primaryLine}
-            <br />
-            <span style={{ fontSize: '0.875rem' }}>{secondaryLine}</span>
-          </p>
+          <p className="page-intro__desc">{primaryLine}</p>
           <div style={{ marginTop: 'var(--sp-sm)', display: 'flex', flexWrap: 'wrap', gap: 'var(--sp-xs)', justifyContent: 'center', alignItems: 'center' }}>
-            <span className="tag-badge">① Browse</span>
-            <span className="tag-badge">② Post</span>
-            <span className="tag-badge">③ Stamp on Base</span>
+            <span className="tag-badge">① 閲覧</span>
+            <span className="tag-badge">② 投稿</span>
+            <span className="tag-badge">③ Baseにスタンプ</span>
           </div>
           <div style={{ marginTop: 'var(--sp-sm)', display: 'flex', flexWrap: 'wrap', gap: 'var(--sp-xs)', justifyContent: 'center' }}>
-            <span className="tag-badge">Base mainnet</span>
-            <span className="tag-badge">博物館スタンプ</span>
-            <span className="tag-badge">bytes32だけ</span>
+            <span className="tag-badge">投稿の証明（ハッシュ）をBaseに刻む</span>
           </div>
           {!q && currentPage === 1 && allGlitches.length > 0 && (
             <div style={{ marginTop: 'var(--sp-sm)' }}>
@@ -136,20 +121,32 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         {!q && currentPage === 1 && featured && (
           <section style={{ marginBottom: 'var(--sp-lg)' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 'var(--sp-sm)' }}>
-              <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--c-text-muted)' }}>ピックアップ</h3>
-              <span className="tag-badge">注目</span>
+              <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--c-text-muted)' }}>注目のバグ</h3>
+              <span className="tag-badge">ピックアップ</span>
             </div>
             <GlitchCard glitch={featured} />
           </section>
         )}
 
         {!q && currentPage === 1 && (
-          <Suspense fallback={<div style={{ color: 'var(--c-text-muted)' }}>人気のバグを読み込み中...</div>}>
+          <Suspense
+            fallback={
+              <div className="loading-inline" style={{ minHeight: '4rem', marginBottom: 'var(--sp-md)' }} aria-label="人気のバグを読み込み中">
+                <span className="loading-spinner" aria-hidden="true" />
+              </div>
+            }
+          >
             <PopularGlitches glitches={allGlitches} />
           </Suspense>
         )}
 
-        <Suspense fallback={<div>読み込み中...</div>}>
+        <Suspense
+          fallback={
+            <div className="loading-inline" style={{ minHeight: '4rem', marginBottom: 'var(--sp-md)' }} aria-label="読み込み中">
+              <span className="loading-spinner" aria-hidden="true" />
+            </div>
+          }
+        >
           <SearchBar />
         </Suspense>
 

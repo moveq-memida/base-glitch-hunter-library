@@ -1,53 +1,58 @@
-# Glitch Hunter Library (Base Mini App) — SUBMIT
+# Glitch Hunter Library
 
-## One-line
-ゲームの“伝説級バグ”をカード化して保存し、**投稿の同一性ハッシュ(bytes32)だけをBase mainnetにスタンプ**して「これは確かに存在した」を刻むミニアプリ。
+> 伝説のゲームバグを投稿して、みんなで投票。気に入った投稿はBaseに“刻める”。
 
-## 「こんなの面白そう！」ポイント（ogiri）
-- “なぞのばしょ”みたいな都市伝説系バグを、**オンチェーンの「博物館スタンプ」**として封印できる。
-- 本文や動画は載せず、**ハッシュだけ**刻むから軽い・安全・共有しやすい。
+## 概要
 
-## Baseをどう使ってる？
-- 投稿ごとにサーバー側で`stampHash(bytes32)`を生成（改ざんしづらい“指紋”）。
-- その`stampHash`を、誰でも **Stamp on Base** ボタンで **Base mainnet(chainId 8453)** に書き込める。
-- 成功したら UI に `Onchain stamped ✅` + **basescan.org** txリンク + `stampHash`コピーを表示。
+Glitch Hunter Library は、ゲームの「有名バグ／珍バグ」を投稿・閲覧・投票できる Base Mini App です。  
+面白い投稿は “Onchain Stamp” で Base mainnet にハッシュだけを刻み、殿堂入りの“証拠”として残せます。
 
-## Demo URL
-- https://base-glitch-hunter-library.vercel.app
+## デモ
 
-## デモで見せたいネタ（推奨）
-### Pokémon Diamond/Pearl: 「なぞのばしょ」バグ
-- タイトル例: `なぞのばしょに行ける（DP版）`
-- ゲーム名: `Pokémon Diamond / Pearl`
-- 動画URL: YouTubeの解説/再現動画
-- 説明例（短く強く）:
-  - `GTS/なぞのばしょ経由で本来行けない空間へ。都市伝説が“再現可能な仕様”として残る。`
+- **アプリURL**: https://base-glitch-hunter-library.vercel.app
+- **スライド**: （ここにGoogle SlidesのURL）
+- **刻印済みの例（審査員向けショートカット）**: https://base-glitch-hunter-library.vercel.app/glitch/3
+- **GlitchRegistry（投稿/投票）**: `0x7Dff70820aB282a49d9A19ca9b1715Ffaa7128F4`（Base mainnet / chainId 8453）
+- **GlitchStamp（刻印）**: `0xb7EfCf8ad9367688F8bC57c1Bf364A510ff9B99A`（Base mainnet / chainId 8453）
+- **刻印Tx例**: https://basescan.org/tx/0x597daf04533c33e723d1999a927878fcb77c6dea619722617e743cd41ac4febd
 
-## 1分デモ台本（そのまま読めます）
-1. 「ゲームのバグって、再現できても“記録が消える”と都市伝説化する。そこで“バグの博物館”を作りました。」
-2. 「これはポケモンダイパの“なぞのばしょ”。まず投稿します（/submit）。」
-3. 「投稿した瞬間に、サーバーが“投稿の指紋”= `stampHash(bytes32)` を作ります（内容はオンチェーンに載りません）。」
-4. 「ここで **Stamp on Base** を押すと、その`bytes32`だけがBase mainnetに刻まれます。」
-5. 「はい、`Onchain stamped ✅`。これが“このバグは確かに存在した”の証拠で、txもbasescanで誰でも検証できます。」
+## 推しポイント
 
-## Onchain stamp hash format (canonical)
-Payloadは **改行区切り・固定順**（7行）:
+1. **5秒でわかるUI**
+   - タイトル直下で「何ができるか」と「Baseを使う理由（刻印）」が分かるようにしています。
+   - 一覧カードに「刻印済み」バッジが出るので、どれが殿堂入りか一目で追えます。
 
-1. `version=1`
-2. `title`
-3. `game`
-4. `videoUrl`
-5. `description`
-6. `createdAtISO`
-7. `authorIdentifier`（wallet or fid。無い場合は空文字）
+2. **Onchain Stamp（Base mainnet）**
+   - 刻印でオンチェーンに残すのは「投稿の存在した証拠（bytes32ハッシュ）」だけです（本文や動画はオンチェーンに載せません）。
+   - 画面上で「刻印済み」表示、Txリンク、stampHashのコピーができます。
+   - stampHashは**必ずサーバー側**で生成します（改行区切り・順序固定で再現可能）。
 
-Notes:
-- 各フィールド内の改行は `\n` に正規化した上で `\\n` にエスケープし、常に7行を維持。
-- Hashing: `keccak256(toBytes(payload))`（**サーバー側のみ**）
+   ```
+   version=1
+   title
+   game
+   videoUrl
+   description
+   createdAt(ISO)
+   authorIdentifier
+   ```
 
-## Repo
-- https://github.com/moveq-memida/base-glitch-hunter-library
+3. **投票もオンチェーン（ただし自動1票は無し）**
+   - 投稿は `contentHash(bytes32)` をオンチェーン登録し、投票数はコントラクトの状態として持ちます。
+   - 投稿しただけでは0票。自分の投稿でも、投票ボタンを押した分だけ票が入ります。
 
-## Contract (Base mainnet)
-- GlitchStamp: `0xb7EfCf8ad9367688F8bC57c1Bf364A510ff9B99A`
-- Basescan: https://basescan.org/address/0xb7EfCf8ad9367688F8bC57c1Bf364A510ff9B99A
+## 使用技術(もしこだわりがあれば)
+
+- **フロントエンド**: Next.js (App Router), TypeScript
+- **バックエンド**: Next.js Route Handlers / API
+- **データベース**: PostgreSQL (Prisma)
+- **インフラ**: Vercel
+- **その他**: Base Mini App（farcaster.json）, viem / wagmi, Base mainnet (chainId 8453), BaseScan
+
+## チームメンバー
+
+- memi (solo dev) - @GitHub（moveq-memida）, @Discord（0x_memi）
+
+---
+
+*このプロジェクトは「12/13-20 大喜利.hack vibecoding mini hackathon」で作成されました*

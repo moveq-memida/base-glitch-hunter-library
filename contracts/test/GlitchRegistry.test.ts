@@ -57,12 +57,11 @@ describe("GlitchRegistry", function () {
     });
 
     it("should allow a user to upvote a glitch", async function () {
-      // user1 is the author and already has 1 vote from submission
       await expect(glitchRegistry.connect(user2).upvote(0))
         .to.emit(glitchRegistry, "GlitchUpvoted")
         .withArgs(0, user2.address);
 
-      expect(await glitchRegistry.getVoteCount(0)).to.equal(2); // 1 (author) + 1 (user2)
+      expect(await glitchRegistry.getVoteCount(0)).to.equal(1);
       expect(await glitchRegistry.hasUserVoted(0, user2.address)).to.be.true;
     });
 
@@ -73,18 +72,17 @@ describe("GlitchRegistry", function () {
         .to.be.revertedWith("Already voted");
     });
 
-    it("should not allow author to vote again (already auto-voted)", async function () {
-      // user1 is the author and already voted on submission
-      await expect(glitchRegistry.connect(user1).upvote(0))
-        .to.be.revertedWith("Already voted");
+    it("should allow author to vote", async function () {
+      await glitchRegistry.connect(user1).upvote(0);
+      expect(await glitchRegistry.getVoteCount(0)).to.equal(1);
     });
 
     it("should allow multiple users to vote", async function () {
-      // user1 is author (already voted), so only user2 and owner can vote
+      await glitchRegistry.connect(user1).upvote(0);
       await glitchRegistry.connect(user2).upvote(0);
       await glitchRegistry.connect(owner).upvote(0);
 
-      expect(await glitchRegistry.getVoteCount(0)).to.equal(3); // 1 (author) + 2 (others)
+      expect(await glitchRegistry.getVoteCount(0)).to.equal(3);
     });
 
     it("should revert when voting on invalid glitch ID", async function () {
@@ -111,21 +109,21 @@ describe("GlitchRegistry", function () {
   });
 
   describe("getVoteCount", function () {
-    it("should return 1 for newly submitted glitch (author auto-vote)", async function () {
+    it("should return 0 for newly submitted glitch", async function () {
       const contentHash = ethers.keccak256(ethers.toUtf8Bytes("test"));
       await glitchRegistry.connect(user1).submitGlitch(contentHash);
 
-      expect(await glitchRegistry.getVoteCount(0)).to.equal(1);
+      expect(await glitchRegistry.getVoteCount(0)).to.equal(0);
     });
 
     it("should return correct vote count after additional votes", async function () {
       const contentHash = ethers.keccak256(ethers.toUtf8Bytes("test"));
       await glitchRegistry.connect(user1).submitGlitch(contentHash);
 
-      // user1 already voted (author), so only user2 can vote
+      await glitchRegistry.connect(user1).upvote(0);
       await glitchRegistry.connect(user2).upvote(0);
 
-      expect(await glitchRegistry.getVoteCount(0)).to.equal(2); // 1 (author) + 1 (user2)
+      expect(await glitchRegistry.getVoteCount(0)).to.equal(2);
     });
 
     it("should revert for invalid glitch ID", async function () {
@@ -140,8 +138,8 @@ describe("GlitchRegistry", function () {
       await glitchRegistry.connect(user1).submitGlitch(contentHash);
     });
 
-    it("should return true for author (auto-voted on submit)", async function () {
-      expect(await glitchRegistry.hasUserVoted(0, user1.address)).to.be.true;
+    it("should return false for author initially", async function () {
+      expect(await glitchRegistry.hasUserVoted(0, user1.address)).to.be.false;
     });
 
     it("should return false if user has not voted", async function () {

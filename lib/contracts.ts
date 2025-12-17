@@ -1,5 +1,11 @@
 import { Abi } from 'viem';
 
+function normalizeAddress(value: string | undefined): `0x${string}` | undefined {
+  if (!value) return undefined;
+  const trimmed = value.trim();
+  return trimmed ? (trimmed as `0x${string}`) : undefined;
+}
+
 // GlitchRegistry contract ABI (minimal - add more functions as needed)
 export const glitchRegistryABI: Abi = [
   {
@@ -75,7 +81,7 @@ export const glitchRegistryABI: Abi = [
   },
 ] as const;
 
-export const GLITCH_REGISTRY_ADDRESS = process.env.NEXT_PUBLIC_GLITCH_REGISTRY_ADDRESS as `0x${string}` | undefined;
+export const GLITCH_REGISTRY_ADDRESS = normalizeAddress(process.env.NEXT_PUBLIC_GLITCH_REGISTRY_ADDRESS);
 
 export const glitchStampABI: Abi = [
   {
@@ -111,4 +117,4 @@ export const glitchStampABI: Abi = [
   },
 ] as const;
 
-export const GLITCH_STAMP_ADDRESS = process.env.NEXT_PUBLIC_GLITCH_STAMP_ADDRESS as `0x${string}` | undefined;
+export const GLITCH_STAMP_ADDRESS = normalizeAddress(process.env.NEXT_PUBLIC_GLITCH_STAMP_ADDRESS);

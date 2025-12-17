@@ -65,9 +65,7 @@ export default function GlitchCard({ glitch, compact = false }: GlitchCardProps)
           </h3>
           {stampTxUrl && (
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', whiteSpace: 'nowrap' }}>
-              <span className="tag-badge" style={{ borderColor: 'var(--c-success)', color: 'var(--c-success)' }}>
-                ✅ Stamped
-              </span>
+              <span className="tag-badge tag-badge--success">刻印済み</span>
               <span
                 className="tag-badge"
                 role="link"

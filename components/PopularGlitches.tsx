@@ -6,9 +6,10 @@ import { base } from 'viem/chains';
 import GlitchCard from './GlitchCard';
 import { glitchRegistryABI, GLITCH_REGISTRY_ADDRESS } from '@/lib/contracts';
 
+const rpcUrl = process.env.NEXT_PUBLIC_BASE_RPC_URL;
 const publicClient = createPublicClient({
   chain: base,
-  transport: http(),
+  transport: rpcUrl ? http(rpcUrl) : http(),
 });
 
 interface Glitch {
@@ -31,26 +32,41 @@ export default function PopularGlitches({ glitches }: PopularGlitchesProps) {
 
   useEffect(() => {
     async function fetchVoteCounts() {
-      if (!GLITCH_REGISTRY_ADDRESS || glitches.length === 0) {
+      const registryAddress = GLITCH_REGISTRY_ADDRESS;
+      if (!registryAddress || glitches.length === 0) {
         setIsLoading(false);
         return;
       }
 
       try {
-        const voteCountPromises = glitches.map((glitch) =>
-          publicClient.readContract({
-            address: GLITCH_REGISTRY_ADDRESS!,
-            abi: glitchRegistryABI,
-            functionName: 'getVoteCount',
-            args: [BigInt(glitch.onchain_glitch_id)],
-          } as const).catch(() => BigInt(0))
-        );
+        const contracts = glitches.map((glitch) => ({
+          address: registryAddress,
+          abi: glitchRegistryABI,
+          functionName: 'getVoteCount' as const,
+          args: [BigInt(glitch.onchain_glitch_id)] as const,
+        }));
 
-        const voteCounts = await Promise.all(voteCountPromises);
+        const chunkSize = 60;
+        const results: bigint[] = [];
+
+        for (let i = 0; i < contracts.length; i += chunkSize) {
+          const chunk = contracts.slice(i, i + chunkSize);
+          const chunkResults = await publicClient.multicall({
+            contracts: chunk,
+            allowFailure: true,
+          });
+          for (const entry of chunkResults) {
+            if (entry.status === 'success') {
+              results.push(entry.result as bigint);
+            } else {
+              results.push(BigInt(0));
+            }
+          }
+        }
 
         const glitchesWithVotes = glitches.map((glitch, index) => ({
           ...glitch,
-          voteCount: Number(voteCounts[index]),
+          voteCount: Number(results[index] ?? BigInt(0)),
         }));
 
         const sorted = glitchesWithVotes
@@ -76,7 +92,9 @@ export default function PopularGlitches({ glitches }: PopularGlitchesProps) {
     return (
       <section className="popular-section">
         <h3 className="popular-section__title">人気のバグ</h3>
-        <p style={{ color: 'var(--c-text-muted)' }}>読み込み中...</p>
+        <div className="loading-inline" style={{ minHeight: '4rem' }} aria-label="人気のバグを読み込み中">
+          <span className="loading-spinner" aria-hidden="true" />
+        </div>
       </section>
     );
   }

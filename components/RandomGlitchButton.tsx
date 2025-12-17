@@ -18,8 +18,7 @@ export default function RandomGlitchButton({ ids }: { ids: Array<number | string
         router.push(`/glitch/${id}`);
       }}
     >
-      🎲 Random glitch
+      🎲 ランダムなバグ
     </button>
   );
 }
-

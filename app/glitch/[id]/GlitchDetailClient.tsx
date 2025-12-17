@@ -8,6 +8,7 @@ import { base, baseSepolia } from 'wagmi/chains';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlitchCard from '@/components/GlitchCard';
+import CelebrationBurst from '@/components/CelebrationBurst';
 import { glitchRegistryABI, GLITCH_REGISTRY_ADDRESS, glitchStampABI, GLITCH_STAMP_ADDRESS } from '@/lib/contracts';
 
 interface Glitch {
@@ -68,6 +69,9 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [stampTxHash, setStampTxHash] = useState<string | null>(glitch?.stamp_tx_hash || null);
+  const [voteToastTxHash, setVoteToastTxHash] = useState<`0x${string}` | null>(null);
+  const [stampToastTxHash, setStampToastTxHash] = useState<`0x${string}` | null>(null);
+  const [celebrate, setCelebrate] = useState<null | 'vote' | 'stamp'>(null);
 
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
@@ -75,6 +79,9 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
 
   const targetChainId = process.env.NEXT_PUBLIC_CHAIN === 'sepolia' ? baseSepolia.id : base.id;
   const basescanBaseUrl = process.env.NEXT_PUBLIC_CHAIN === 'sepolia' ? 'https://sepolia.basescan.org' : 'https://basescan.org';
+  const targetChainLabel = targetChainId === baseSepolia.id ? 'Base Sepolia' : 'Base mainnet';
+  const currentChainLabel =
+    chainId === base.id ? 'Base mainnet' : chainId === baseSepolia.id ? 'Base Sepolia' : chainId === 1 ? 'Ethereum mainnet' : `chainId ${chainId}`;
 
   const { writeContract: writeUpvote, data: upvoteWriteTxHash, isPending: isUpvotePending } = useWriteContract();
   const {
@@ -97,7 +104,7 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
   });
 
   // Check if user has voted
-  const { data: hasVoted } = useReadContract({
+  const { data: hasVoted, refetch: refetchHasVoted } = useReadContract({
     address: GLITCH_REGISTRY_ADDRESS,
     abi: glitchRegistryABI,
     functionName: 'hasUserVoted',
@@ -130,6 +137,16 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
       return;
     }
 
+    if (chainId !== targetChainId) {
+      try {
+        await switchChain({ chainId: targetChainId });
+      } catch (switchError) {
+        console.error('Network switch error:', switchError);
+        setError(`ウォレットを${targetChainLabel}に切り替えてください。`);
+        return;
+      }
+    }
+
     try {
       writeUpvote({
         address: GLITCH_REGISTRY_ADDRESS,
@@ -144,15 +161,49 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
   };
 
   // Wait for transaction and refetch vote count
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+  const {
+    isLoading: isConfirming,
+    isSuccess: isConfirmed,
+    isError: isConfirmError,
+    error: confirmError,
+  } = useWaitForTransactionReceipt({
     hash: upvoteWriteTxHash,
+    chainId: targetChainId,
+    timeout: 120_000,
   });
 
   React.useEffect(() => {
     if (isConfirmed) {
       refetchVoteCount();
+      refetchHasVoted();
     }
-  }, [isConfirmed, refetchVoteCount]);
+  }, [isConfirmed, refetchVoteCount, refetchHasVoted]);
+
+  React.useEffect(() => {
+    if (!isConfirmed || !upvoteWriteTxHash) return;
+
+    setVoteToastTxHash(upvoteWriteTxHash);
+    try {
+      navigator.vibrate?.(20);
+    } catch {
+      // ignore
+    }
+
+    setCelebrate('vote');
+    const celebrateTimeout = window.setTimeout(() => setCelebrate(null), 900);
+
+    const timeout = window.setTimeout(() => setVoteToastTxHash(null), 2200);
+    return () => {
+      window.clearTimeout(timeout);
+      window.clearTimeout(celebrateTimeout);
+    };
+  }, [isConfirmed, upvoteWriteTxHash]);
+
+  React.useEffect(() => {
+    if (!isConfirmError || !confirmError) return;
+    console.error('Upvote confirmation error:', confirmError);
+    setError(`投票の確定に失敗しました。ネットワークが${targetChainLabel}か確認してください。`);
+  }, [isConfirmError, confirmError, targetChainLabel]);
 
   const handleStamp = async () => {
     setError(null);
@@ -203,9 +254,22 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
     }
   };
 
-  const { isLoading: isStampConfirming, isSuccess: isStampConfirmed } = useWaitForTransactionReceipt({
+  const {
+    isLoading: isStampConfirming,
+    isSuccess: isStampConfirmed,
+    isError: isStampConfirmError,
+    error: stampConfirmError,
+  } = useWaitForTransactionReceipt({
     hash: stampWriteTxHash,
+    chainId: targetChainId,
+    timeout: 180_000,
   });
+
+  React.useEffect(() => {
+    if (!isStampConfirmError || !stampConfirmError) return;
+    console.error('Stamp confirmation error:', stampConfirmError);
+    setError(`スタンプの確定に失敗しました。ネットワークが${targetChainLabel}か確認してください。`);
+  }, [isStampConfirmError, stampConfirmError, targetChainLabel]);
 
   React.useEffect(() => {
     if (!isStampConfirmed || !stampWriteTxHash || !glitch) return;
@@ -230,6 +294,26 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
 
     confirm();
   }, [isStampConfirmed, stampWriteTxHash, glitch, router]);
+
+  React.useEffect(() => {
+    if (!isStampConfirmed || !stampWriteTxHash) return;
+
+    setStampToastTxHash(stampWriteTxHash);
+    try {
+      navigator.vibrate?.([20, 40, 20]);
+    } catch {
+      // ignore
+    }
+
+    setCelebrate('stamp');
+    const celebrateTimeout = window.setTimeout(() => setCelebrate(null), 1000);
+    const toastTimeout = window.setTimeout(() => setStampToastTxHash(null), 2400);
+
+    return () => {
+      window.clearTimeout(celebrateTimeout);
+      window.clearTimeout(toastTimeout);
+    };
+  }, [isStampConfirmed, stampWriteTxHash]);
 
   React.useEffect(() => {
     if (stampWriteError) {
@@ -324,15 +408,23 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
                 type="button"
                 className="glitch-vote__button"
                 onClick={handleUpvote}
-                disabled={isUpvotePending || isConfirming || !!hasVoted || !isConnected}
+                disabled={isUpvotePending || isConfirming || !!hasVoted || !isConnected || !!voteToastTxHash}
+                data-celebrate={voteToastTxHash ? 'true' : 'false'}
               >
-                {isUpvotePending || isConfirming
+                {voteToastTxHash
+                  ? '投票完了！'
+                  : isUpvotePending || isConfirming
                   ? '投票中...'
                   : hasVoted
                   ? '投票済み'
                   : '▲ 投票'}
               </button>
             </section>
+            {isConnected && chainId !== targetChainId && (
+              <p style={{ fontSize: '0.875rem', color: 'var(--c-text-muted)', marginTop: '0.5rem' }}>
+                現在のネットワーク: {currentChainLabel}（投票/スタンプは {targetChainLabel} が必要です）
+              </p>
+            )}
             {!isConnected && (
               <p style={{ fontSize: '0.875rem', color: 'var(--c-text-muted)', marginTop: '0.5rem' }}>
                 投票するにはウォレット接続が必要です。
@@ -341,14 +433,12 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
 
             <section className="glitch-vote" style={{ marginTop: 'var(--sp-sm)', flexWrap: 'wrap', gap: 'var(--sp-sm)' }}>
               <span
-                className="tag-badge"
+                className={`tag-badge${stampTxHash ? ' tag-badge--success' : ''}`}
                 style={{
-                  borderColor: stampTxHash ? 'var(--c-success)' : 'var(--c-border)',
-                  color: stampTxHash ? 'var(--c-success)' : 'var(--c-text-muted)',
                   fontSize: '0.875rem',
                 }}
               >
-                {stampTxHash ? 'オンチェーン封印済み ✅' : '未スタンプ'}
+                {stampTxHash ? '刻印済み' : '未スタンプ'}
               </span>
               {stampTxHash ? (
                 <a
@@ -373,7 +463,7 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
               )}
             </section>
             <p style={{ color: 'var(--c-text-muted)', fontSize: '0.875rem', margin: 'var(--sp-xs) 0 0' }}>
-              スタンプすると、この投稿の「指紋ハッシュ（bytes32）」だけがBaseに残ります。本文や動画は載りません。
+              スタンプすると、この投稿が“存在した証拠（ハッシュ）”としてBaseに残ります。内容はオンチェーンに載りません。
             </p>
 
             {glitch.stamp_hash && (
@@ -411,6 +501,23 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
           </section>
         )}
       </main>
+      {celebrate && <CelebrationBurst variant={celebrate} />}
+      {voteToastTxHash && (
+        <div className="toast" role="status" aria-live="polite">
+          <span>投票しました</span>
+          <a href={`${basescanBaseUrl}/tx/${voteToastTxHash}`} target="_blank" rel="noopener noreferrer" className="toast__link">
+            Txを見る
+          </a>
+        </div>
+      )}
+      {stampToastTxHash && (
+        <div className="toast" role="status" aria-live="polite">
+          <span>スタンプしました</span>
+          <a href={`${basescanBaseUrl}/tx/${stampToastTxHash}`} target="_blank" rel="noopener noreferrer" className="toast__link">
+            Txを見る
+          </a>
+        </div>
+      )}
       <Footer />
     </div>
   );
