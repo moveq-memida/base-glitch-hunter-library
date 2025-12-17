@@ -10,7 +10,7 @@ Glitch Hunter Library は、ゲームの「有名バグ／珍バグ」を投稿�
 ## デモ
 
 - **アプリURL**: https://base-glitch-hunter-library.vercel.app
-- **スライド**: （ここにGoogle SlidesのURL）
+- **スライド**: https://hackathons-slide.vercel.app/
 - **刻印済みの例（審査員向けショートカット）**: https://base-glitch-hunter-library.vercel.app/glitch/3
 - **GlitchRegistry（投稿/投票）**: `0x7Dff70820aB282a49d9A19ca9b1715Ffaa7128F4`（Base mainnet / chainId 8453）
 - **GlitchStamp（刻印）**: `0xb7EfCf8ad9367688F8bC57c1Bf364A510ff9B99A`（Base mainnet / chainId 8453）
