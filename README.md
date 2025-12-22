@@ -7,27 +7,27 @@ A Web3 dApp for discovering, submitting, and voting on video game glitches (bugs
 - **Frontend**: Next.js 16 (App Router) + TypeScript + TailwindCSS
 - **Web3**: wagmi + viem for blockchain interactions
 - **Database**: PostgreSQL + Prisma ORM
-- **Smart Contract**: Solidity + Hardhat (Base Sepolia → Base Mainnet)
+- **Smart Contract**: Solidity + Hardhat (Base Sepolia -> Base Mainnet)
 
 ## Project Structure
 
 ```
 base-glitch-hunter-library/
-├── app/                    # Next.js App Router pages
-│   ├── api/               # API routes for database operations
-│   ├── glitch/[id]/       # Individual glitch detail page
-│   ├── submit/            # Glitch submission form
-│   └── page.tsx           # Home page (glitch listing)
-├── components/            # Reusable React components
-├── contracts/             # Hardhat project for smart contracts
-│   ├── contracts/         # Solidity contracts
-│   ├── scripts/           # Deployment scripts
-│   └── test/              # Contract tests
-├── lib/                   # Utility libraries
-│   ├── prisma.ts          # Prisma client wrapper
-│   ├── wagmi.ts           # wagmi configuration
-│   └── contracts.ts       # Contract ABIs and addresses
-└── prisma/                # Database schema and migrations
+|-- app/                    # Next.js App Router pages
+|   |-- api/                # API routes for database operations
+|   |-- glitch/[id]/        # Individual glitch detail page
+|   |-- submit/             # Glitch submission form
+|   `-- page.tsx            # Home page (glitch listing)
+|-- components/             # Reusable React components
+|-- contracts/              # Hardhat project for smart contracts
+|   |-- contracts/          # Solidity contracts
+|   |-- scripts/            # Deployment scripts
+|   `-- test/               # Contract tests
+|-- lib/                    # Utility libraries
+|   |-- prisma.ts           # Prisma client wrapper
+|   |-- wagmi.ts            # wagmi configuration
+|   `-- contracts.ts        # Contract ABIs and addresses
+`-- prisma/                 # Database schema and migrations
 ```
 
 ## Prerequisites
@@ -64,6 +64,9 @@ DATABASE_URL="your_postgres_connection_string"
 # Base Network RPC URLs (defaults provided)
 BASE_SEPOLIA_RPC_URL="https://sepolia.base.org"
 BASE_MAINNET_RPC_URL="https://mainnet.base.org"
+
+# Optional: default UI language when ?lang is not provided ("ja" or "en")
+NEXT_PUBLIC_LANG="ja"
 
 # Deployer wallet private key (for contract deployment)
 DEPLOYER_PRIVATE_KEY="your_private_key_here"
@@ -175,7 +178,7 @@ npx prisma studio      # Open Prisma Studio (database GUI)
 ### Stamping a Glitch (Hash Only)
 
 For hackathon/demo clarity, each post has a **server-generated** `stamp_hash` (bytes32) that represents the post identity.  
-Users can optionally “stamp” that hash on Base via `GlitchStamp.stamp(hash, uri)`, and the UI shows `Onchain stamped ✅` with a Basescan link.
+Users can optionally "stamp" that hash on Base via `GlitchStamp.stamp(hash, uri)`, and the UI shows `Onchain stamped` with a Basescan link.
 
 ### Voting on a Glitch
 
@@ -288,6 +291,7 @@ NEXT_PUBLIC_APP_URL="https://your-app.vercel.app"
 # Network configuration
 NEXT_PUBLIC_CHAIN="mainnet"  # or "sepolia" for testnet
 NEXT_PUBLIC_BASE_RPC_URL="https://mainnet.base.org"  # or "https://sepolia.base.org"
+NEXT_PUBLIC_LANG="en"  # or "ja"
 
 # Farcaster Account Association (from Base Build tool)
 FARCASTER_HEADER=""

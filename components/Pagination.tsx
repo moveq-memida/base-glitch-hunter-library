@@ -11,12 +11,31 @@ interface PaginationProps {
 export default function Pagination({ currentPage, totalPages }: PaginationProps) {
   const searchParams = useSearchParams();
   const query = searchParams.get('q');
+  const langParam = searchParams.get('lang');
+  const envLang = (process.env.NEXT_PUBLIC_LANG || '').toLowerCase();
+  const fallbackLang = envLang === 'en' || envLang === 'ja' ? envLang : '';
+  const lang = (langParam === 'en' || langParam === 'ja' ? langParam : fallbackLang) || 'ja';
+  const isEnglish = lang === 'en';
+  const shouldIncludeLang = Boolean(langParam || fallbackLang);
 
   if (totalPages <= 1) return null;
+
+  const labels = isEnglish
+    ? {
+        previous: '← Prev',
+        next: 'Next →',
+        page: 'Page',
+      }
+    : {
+        previous: '← 前へ',
+        next: '次へ →',
+        page: 'ページ',
+      };
 
   const createPageUrl = (page: number) => {
     const params = new URLSearchParams();
     if (query) params.set('q', query);
+    if (shouldIncludeLang) params.set('lang', lang);
     params.set('page', page.toString());
     return `/?${params.toString()}`;
   };
@@ -25,17 +44,17 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
     <nav className="pagination">
       {currentPage > 1 && (
         <Link href={createPageUrl(currentPage - 1)} className="pagination__link">
-          ← 前へ
+          {labels.previous}
         </Link>
       )}
 
       <span className="pagination__info">
-        ページ {currentPage} / {totalPages}
+        {labels.page} {currentPage} / {totalPages}
       </span>
 
       {currentPage < totalPages && (
         <Link href={createPageUrl(currentPage + 1)} className="pagination__link">
-          次へ →
+          {labels.next}
         </Link>
       )}
     </nav>

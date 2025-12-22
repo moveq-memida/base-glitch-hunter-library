@@ -1,15 +1,27 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from 'wagmi';
+import { useRouter, useSearchParams } from 'next/navigation';
+import {
+  useAccount,
+  useReadContract,
+  useWriteContract,
+  useWaitForTransactionReceipt,
+  useChainId,
+  useSwitchChain,
+} from 'wagmi';
 import { base, baseSepolia } from 'wagmi/chains';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlitchCard from '@/components/GlitchCard';
 import CelebrationBurst from '@/components/CelebrationBurst';
-import { glitchRegistryABI, GLITCH_REGISTRY_ADDRESS, glitchStampABI, GLITCH_STAMP_ADDRESS } from '@/lib/contracts';
+import {
+  glitchRegistryABI,
+  GLITCH_REGISTRY_ADDRESS,
+  glitchStampABI,
+  GLITCH_STAMP_ADDRESS,
+} from '@/lib/contracts';
 
 interface Glitch {
   id: string | number;
@@ -26,31 +38,6 @@ interface Glitch {
   stamped_at?: string | Date | null;
 }
 
-function getYouTubeEmbedUrl(url: string | null): string | null {
-  if (!url) return null;
-
-  // Already an embed URL
-  if (url.includes('youtube.com/embed/')) {
-    return url;
-  }
-
-  // Extract video ID from various YouTube URL formats
-  const patterns = [
-    /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
-    /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
-  ];
-
-  for (const pattern of patterns) {
-    const match = url.match(pattern);
-    if (match && match[1]) {
-      return `https://www.youtube.com/embed/${match[1]}`;
-    }
-  }
-
-  // Not a YouTube URL, return as-is (for other video services)
-  return url;
-}
-
 interface RelatedGlitch {
   id: number;
   title: string;
@@ -63,25 +50,219 @@ interface RelatedGlitch {
 interface GlitchDetailClientProps {
   glitch: Glitch | null;
   relatedGlitches?: RelatedGlitch[];
+  prevGlitchId?: number | null;
+  nextGlitchId?: number | null;
 }
 
-export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: GlitchDetailClientProps) {
+function getYouTubeEmbedUrl(url: string | null): string | null {
+  if (!url) return null;
+
+  if (url.includes('youtube.com/embed/')) {
+    return url;
+  }
+
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
+    /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match && match[1]) {
+      return `https://www.youtube.com/embed/${match[1]}`;
+    }
+  }
+
+  return url;
+}
+
+export default function GlitchDetailClient({
+  glitch,
+  relatedGlitches = [],
+  prevGlitchId = null,
+  nextGlitchId = null,
+}: GlitchDetailClientProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const langParam = searchParams.get('lang');
+  const envLang = (process.env.NEXT_PUBLIC_LANG || '').toLowerCase();
+  const fallbackLang = envLang === 'en' || envLang === 'ja' ? envLang : '';
+  const lang = (langParam === 'en' || langParam === 'ja' ? langParam : fallbackLang) || 'ja';
+  const isEnglish = lang === 'en';
+  const shouldIncludeLang = Boolean(langParam || fallbackLang);
+
+  const withLang = (href: string) => {
+    if (!shouldIncludeLang) return href;
+    if (!href.startsWith('/') || href.includes('lang=')) return href;
+    const [path, query] = href.split('?');
+    const params = new URLSearchParams(query || '');
+    params.set('lang', lang);
+    return `${path}?${params.toString()}`;
+  };
+
+  const homeHref = withLang('/');
+  const submitHref = withLang('/submit');
+
+  const copy = useMemo(
+    () =>
+      isEnglish
+        ? {
+            headerAction: 'Submit',
+            notFound: 'Glitch not found.',
+            backToList: 'Back to list',
+            labels: {
+              game: 'Game',
+              platform: 'Platform',
+              hunter: 'Hunter',
+              noVideo: 'No video',
+              videoUnavailable: 'Video unavailable.',
+              openVideo: 'Open original',
+              vote: '▲ Vote',
+              voted: 'Voted',
+              voting: 'Confirming...',
+              votingWallet: 'Confirm in wallet',
+              voteDone: 'Voted!',
+              networkStatus: (current: string, target: string) =>
+                `Current network: ${current} (Voting/stamping requires ${target})`,
+              connectToVote: 'Connect wallet to vote.',
+              walletConfirm: 'Confirm in wallet.',
+              stamped: 'Stamped',
+              notStamped: 'Not stamped',
+              viewTx: 'View tx',
+              stamping: 'Confirming...',
+              stampingWallet: 'Confirm in wallet',
+              stampCta: 'Stamp on Base',
+              stampInfo: 'Only a hash is stored on Base. Content stays offchain.',
+              stampHash: 'stampHash',
+              copy: 'Copy',
+              related: (game: string) => `More glitches in ${game}`,
+              voteSubmitted: 'Vote submitted. Waiting for confirmation...',
+              stampSubmitted: 'Stamp submitted. Waiting for confirmation...',
+              toastVote: 'Voted',
+              toastStamp: 'Stamped',
+              celebrateVote: 'Vote complete',
+              celebrateStamp: 'Stamp complete',
+              prevGlitch: 'Previous',
+              nextGlitch: 'Next glitch',
+              randomGlitch: 'Random',
+            },
+            errors: {
+              walletRequiredVote: 'Connect your wallet to vote.',
+              postNotFound: 'Glitch not found.',
+              contractMissing: 'Contract address is missing.',
+              alreadyVoted: 'You already voted for this post.',
+              switchNetwork: (label: string) => `Please switch your wallet to ${label}.`,
+              voteFailed: 'Vote failed. Try again.',
+              voteConfirmFailed: (label: string) =>
+                `Vote confirmation failed. Please check you're on ${label}.`,
+              walletRequiredStamp: 'Connect your wallet to stamp.',
+              stampHashMissing: 'stampHash is not ready for this post.',
+              stampContractMissing: 'Stamp contract is missing.',
+              stampFailed: 'Stamp failed. Try again.',
+              stampConfirmFailed: (label: string) =>
+                `Stamp confirmation failed. Please check you're on ${label}.`,
+              txCanceled: 'Transaction canceled.',
+              alreadyStamped: 'This post is already stamped.',
+              stampFailedWithMessage: (message: string) => `Stamp failed: ${message}`,
+              copyFailed: 'Failed to copy stampHash.',
+            },
+          }
+        : {
+            headerAction: '投稿する',
+            notFound: '投稿が見つかりません。',
+            backToList: '一覧に戻る',
+            labels: {
+              game: 'ゲーム',
+              platform: '機種',
+              hunter: '発見者',
+              noVideo: '動画なし',
+              videoUnavailable: '動画を再生できません。',
+              openVideo: '元の動画を開く',
+              vote: '▲ 投票',
+              voted: '投票済み',
+              voting: '確定中...',
+              votingWallet: 'ウォレットで承認',
+              voteDone: '投票完了！',
+              networkStatus: (current: string, target: string) =>
+                `現在のネットワーク: ${current}（投票/スタンプは${target}が必要）`,
+              connectToVote: '投票するにはウォレット接続が必要です。',
+              walletConfirm: 'ウォレットで承認してください。',
+              stamped: '刻印済み',
+              notStamped: '未スタンプ',
+              viewTx: 'Txを見る',
+              stamping: '確定中...',
+              stampingWallet: 'ウォレットで承認',
+              stampCta: 'Baseにスタンプ',
+              stampInfo: 'Baseにはハッシュだけ保存。内容はオフチェーンのままです。',
+              stampHash: 'stampHash',
+              copy: 'コピー',
+              related: (game: string) => `${game} の他のバグ`,
+              voteSubmitted: '投票を送信しました。確定待ち...',
+              stampSubmitted: 'スタンプを送信しました。確定待ち...',
+              toastVote: '投票しました',
+              toastStamp: 'スタンプしました',
+              celebrateVote: '投票完了',
+              celebrateStamp: 'スタンプ完了',
+              prevGlitch: '前のグリッチ',
+              nextGlitch: '次のグリッチ',
+              randomGlitch: 'ランダム',
+            },
+            errors: {
+              walletRequiredVote: '投票するにはウォレット接続が必要です。',
+              postNotFound: '投稿が見つかりません。',
+              contractMissing: 'コントラクトアドレスが未設定です。',
+              alreadyVoted: 'この投稿には投票済みです。',
+              switchNetwork: (label: string) => `ウォレットを${label}に切り替えてください。`,
+              voteFailed: '投票に失敗しました。もう一度お試しください。',
+              voteConfirmFailed: (label: string) =>
+                `投票の確定に失敗しました。${label}か確認してください。`,
+              walletRequiredStamp: 'スタンプするにはウォレット接続が必要です。',
+              stampHashMissing: 'この投稿のstampHashがまだ生成されていません。',
+              stampContractMissing: 'スタンプ用コントラクトが未設定です。',
+              stampFailed: 'スタンプに失敗しました。もう一度お試しください。',
+              stampConfirmFailed: (label: string) =>
+                `スタンプの確定に失敗しました。${label}か確認してください。`,
+              txCanceled: 'トランザクションがキャンセルされました。',
+              alreadyStamped: 'この投稿は既にスタンプ済みです。',
+              stampFailedWithMessage: (message: string) => `スタンプに失敗しました: ${message}`,
+              copyFailed: 'stampHashのコピーに失敗しました。',
+            },
+          },
+    [isEnglish]
+  );
+
   const [error, setError] = useState<string | null>(null);
   const [stampTxHash, setStampTxHash] = useState<string | null>(glitch?.stamp_tx_hash || null);
   const [voteToastTxHash, setVoteToastTxHash] = useState<`0x${string}` | null>(null);
   const [stampToastTxHash, setStampToastTxHash] = useState<`0x${string}` | null>(null);
   const [celebrate, setCelebrate] = useState<null | 'vote' | 'stamp'>(null);
+  const [displayVoteCount, setDisplayVoteCount] = useState<number | null>(null);
+  const [videoError, setVideoError] = useState(false);
+
+  useEffect(() => {
+    setStampTxHash(glitch?.stamp_tx_hash || null);
+  }, [glitch?.stamp_tx_hash, glitch?.id]);
+
+  useEffect(() => {
+    setVideoError(false);
+  }, [glitch?.video_url]);
 
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
   const { switchChain } = useSwitchChain();
 
   const targetChainId = process.env.NEXT_PUBLIC_CHAIN === 'sepolia' ? baseSepolia.id : base.id;
-  const basescanBaseUrl = process.env.NEXT_PUBLIC_CHAIN === 'sepolia' ? 'https://sepolia.basescan.org' : 'https://basescan.org';
+  const basescanBaseUrl =
+    process.env.NEXT_PUBLIC_CHAIN === 'sepolia' ? 'https://sepolia.basescan.org' : 'https://basescan.org';
   const targetChainLabel = targetChainId === baseSepolia.id ? 'Base Sepolia' : 'Base mainnet';
   const currentChainLabel =
-    chainId === base.id ? 'Base mainnet' : chainId === baseSepolia.id ? 'Base Sepolia' : chainId === 1 ? 'Ethereum mainnet' : `chainId ${chainId}`;
+    chainId === base.id
+      ? 'Base mainnet'
+      : chainId === baseSepolia.id
+      ? 'Base Sepolia'
+      : chainId === 1
+      ? 'Ethereum mainnet'
+      : `chainId ${chainId}`;
 
   const { writeContract: writeUpvote, data: upvoteWriteTxHash, isPending: isUpvotePending } = useWriteContract();
   const {
@@ -92,7 +273,6 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
     reset: resetStampWrite,
   } = useWriteContract();
 
-  // Read vote count from contract
   const { data: voteCount, refetch: refetchVoteCount } = useReadContract({
     address: GLITCH_REGISTRY_ADDRESS,
     abi: glitchRegistryABI,
@@ -103,7 +283,6 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
     },
   });
 
-  // Check if user has voted
   const { data: hasVoted, refetch: refetchHasVoted } = useReadContract({
     address: GLITCH_REGISTRY_ADDRESS,
     abi: glitchRegistryABI,
@@ -114,26 +293,37 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
     },
   });
 
+  useEffect(() => {
+    if (voteCount != null) {
+      setDisplayVoteCount(Number(voteCount));
+    }
+  }, [voteCount]);
+
+  useEffect(() => {
+    if (!upvoteWriteTxHash) return;
+    setDisplayVoteCount((prev) => (prev == null ? prev : prev + 1));
+  }, [upvoteWriteTxHash]);
+
   const handleUpvote = async () => {
     setError(null);
 
     if (!isConnected || !address) {
-      setError('投票するにはウォレット接続が必要です。');
+      setError(copy.errors.walletRequiredVote);
       return;
     }
 
     if (!glitch) {
-      setError('投稿が見つかりません。');
+      setError(copy.errors.postNotFound);
       return;
     }
 
     if (!GLITCH_REGISTRY_ADDRESS) {
-      setError('コントラクトが未設定です。');
+      setError(copy.errors.contractMissing);
       return;
     }
 
     if (hasVoted) {
-      setError('この投稿には投票済みです。');
+      setError(copy.errors.alreadyVoted);
       return;
     }
 
@@ -142,7 +332,7 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
         await switchChain({ chainId: targetChainId });
       } catch (switchError) {
         console.error('Network switch error:', switchError);
-        setError(`ウォレットを${targetChainLabel}に切り替えてください。`);
+        setError(copy.errors.switchNetwork(targetChainLabel));
         return;
       }
     }
@@ -154,13 +344,12 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
         functionName: 'upvote',
         args: [BigInt(glitch.onchain_glitch_id)],
       });
-    } catch (error) {
-      console.error('Upvote error:', error);
-      setError('投票に失敗しました。もう一度お試しください。');
+    } catch (upvoteError) {
+      console.error('Upvote error:', upvoteError);
+      setError(copy.errors.voteFailed);
     }
   };
 
-  // Wait for transaction and refetch vote count
   const {
     isLoading: isConfirming,
     isSuccess: isConfirmed,
@@ -172,14 +361,14 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
     timeout: 120_000,
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isConfirmed) {
       refetchVoteCount();
       refetchHasVoted();
     }
   }, [isConfirmed, refetchVoteCount, refetchHasVoted]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isConfirmed || !upvoteWriteTxHash) return;
 
     setVoteToastTxHash(upvoteWriteTxHash);
@@ -191,40 +380,40 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
 
     setCelebrate('vote');
     const celebrateTimeout = window.setTimeout(() => setCelebrate(null), 900);
-
     const timeout = window.setTimeout(() => setVoteToastTxHash(null), 2200);
+
     return () => {
       window.clearTimeout(timeout);
       window.clearTimeout(celebrateTimeout);
     };
   }, [isConfirmed, upvoteWriteTxHash]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isConfirmError || !confirmError) return;
     console.error('Upvote confirmation error:', confirmError);
-    setError(`投票の確定に失敗しました。ネットワークが${targetChainLabel}か確認してください。`);
-  }, [isConfirmError, confirmError, targetChainLabel]);
+    setError(copy.errors.voteConfirmFailed(targetChainLabel));
+  }, [isConfirmError, confirmError, targetChainLabel, copy.errors]);
 
   const handleStamp = async () => {
     setError(null);
 
     if (!isConnected || !address) {
-      setError('スタンプするにはウォレット接続が必要です。');
+      setError(copy.errors.walletRequiredStamp);
       return;
     }
 
     if (!glitch) {
-      setError('投稿が見つかりません。');
+      setError(copy.errors.postNotFound);
       return;
     }
 
     if (!glitch.stamp_hash) {
-      setError('この投稿のstampHashがまだ生成されていません。');
+      setError(copy.errors.stampHashMissing);
       return;
     }
 
     if (!GLITCH_STAMP_ADDRESS) {
-      setError('スタンプ用コントラクトが未設定です。');
+      setError(copy.errors.stampContractMissing);
       return;
     }
 
@@ -233,7 +422,7 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
         await switchChain({ chainId: targetChainId });
       } catch (switchError) {
         console.error('Network switch error:', switchError);
-        setError('ウォレットをBase mainnetに切り替えてください。');
+        setError(copy.errors.switchNetwork(targetChainLabel));
         return;
       }
     }
@@ -250,7 +439,7 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
       });
     } catch (stampError) {
       console.error('Stamp error:', stampError);
-      setError('スタンプに失敗しました。もう一度お試しください。');
+      setError(copy.errors.stampFailed);
     }
   };
 
@@ -265,13 +454,13 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
     timeout: 180_000,
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isStampConfirmError || !stampConfirmError) return;
     console.error('Stamp confirmation error:', stampConfirmError);
-    setError(`スタンプの確定に失敗しました。ネットワークが${targetChainLabel}か確認してください。`);
-  }, [isStampConfirmError, stampConfirmError, targetChainLabel]);
+    setError(copy.errors.stampConfirmFailed(targetChainLabel));
+  }, [isStampConfirmError, stampConfirmError, targetChainLabel, copy.errors]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isStampConfirmed || !stampWriteTxHash || !glitch) return;
 
     const confirm = async () => {
@@ -295,7 +484,7 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
     confirm();
   }, [isStampConfirmed, stampWriteTxHash, glitch, router]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isStampConfirmed || !stampWriteTxHash) return;
 
     setStampToastTxHash(stampWriteTxHash);
@@ -315,28 +504,27 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
     };
   }, [isStampConfirmed, stampWriteTxHash]);
 
-  React.useEffect(() => {
-    if (stampWriteError) {
-      const message = stampWriteError.message || 'Transaction failed';
-      if (message.includes('User rejected') || message.includes('user rejected')) {
-        setError('トランザクションがキャンセルされました。');
-      } else if (message.includes('Already stamped')) {
-        setError('この投稿は既にスタンプ済みです。');
-      } else {
-        setError(`スタンプに失敗しました: ${message.slice(0, 120)}`);
-      }
-      resetStampWrite();
+  useEffect(() => {
+    if (!stampWriteError) return;
+    const message = stampWriteError.message || 'Transaction failed';
+    if (message.includes('User rejected') || message.includes('user rejected')) {
+      setError(copy.errors.txCanceled);
+    } else if (message.includes('Already stamped')) {
+      setError(copy.errors.alreadyStamped);
+    } else {
+      setError(copy.errors.stampFailedWithMessage(message.slice(0, 120)));
     }
-  }, [stampWriteError, resetStampWrite]);
+    resetStampWrite();
+  }, [stampWriteError, resetStampWrite, copy.errors]);
 
   if (!glitch) {
     return (
       <div className="page">
-        <Header />
+        <Header actionText={copy.headerAction} actionHref={submitHref} />
         <main className="page-main">
-          <p>投稿が見つかりません。</p>
-          <Link href="/" className="page-back-link">
-            一覧に戻る
+          <p>{copy.notFound}</p>
+          <Link href={homeHref} className="page-back-link">
+            {copy.backToList}
           </Link>
         </main>
         <Footer />
@@ -345,27 +533,50 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
   }
 
   const tags = glitch.tags ? glitch.tags.split(',').map((tag) => tag.trim()) : [];
+  const voteCountDisplay = displayVoteCount ?? (voteCount != null ? Number(voteCount) : 0);
+  const voteButtonLabel = voteToastTxHash
+    ? copy.labels.voteDone
+    : isUpvotePending
+    ? copy.labels.votingWallet
+    : isConfirming
+    ? copy.labels.voting
+    : hasVoted
+    ? copy.labels.voted
+    : copy.labels.vote;
+  const stampButtonLabel = isStampPending
+    ? copy.labels.stampingWallet
+    : isStampConfirming
+    ? copy.labels.stamping
+    : copy.labels.stampCta;
+  const voteStatusTxLink = upvoteWriteTxHash ? `${basescanBaseUrl}/tx/${upvoteWriteTxHash}` : null;
+  const stampStatusTxLink = stampWriteTxHash ? `${basescanBaseUrl}/tx/${stampWriteTxHash}` : null;
 
   return (
     <div className="page">
-      <Header />
+      <Header actionText={copy.headerAction} actionHref={submitHref} />
       <main className="page-main">
-        <Link href="/" className="page-back-link">
-          一覧に戻る
+        <Link href={homeHref} className="page-back-link">
+          {copy.backToList}
         </Link>
 
         <h1 className="glitch-detail__title">{glitch.title}</h1>
 
         <div className="glitch-meta">
-          <span>ゲーム: {glitch.game_name}</span>
-          <span>機種: {glitch.platform}</span>
-          <span>発見者: {glitch.author_address}</span>
+          <span>
+            {copy.labels.game}: {glitch.game_name}
+          </span>
+          <span>
+            {copy.labels.platform}: {glitch.platform}
+          </span>
+          <span>
+            {copy.labels.hunter}: {glitch.author_address}
+          </span>
         </div>
 
         <section className="glitch-content">
           <div className="glitch-video">
             <div className="glitch-video__frame">
-              {glitch.video_url ? (
+              {glitch.video_url && !videoError ? (
                 <iframe
                   width="100%"
                   height="100%"
@@ -374,11 +585,21 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
+                  onError={() => setVideoError(true)}
                 />
               ) : (
-                <span>動画なし</span>
+                <span>
+                  {glitch.video_url ? copy.labels.videoUnavailable : copy.labels.noVideo}
+                </span>
               )}
             </div>
+            {glitch.video_url && videoError && (
+              <div className="glitch-action__status">
+                <a href={glitch.video_url} target="_blank" rel="noopener noreferrer">
+                  {copy.labels.openVideo}
+                </a>
+              </div>
+            )}
           </div>
 
           <div className="glitch-info">
@@ -396,49 +617,51 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
               </div>
             )}
 
-            {error && (
-              <p style={{ color: 'var(--c-danger)', marginBottom: '1rem' }}>{error}</p>
-            )}
+            {error && <p className="glitch-form__error">{error}</p>}
 
             <section className="glitch-vote">
-              <span className="glitch-vote__count">
-                {voteCount != null ? voteCount.toString() : '0'}
-              </span>
+              <span className="glitch-vote__count">{voteCountDisplay}</span>
               <button
                 type="button"
                 className="glitch-vote__button"
                 onClick={handleUpvote}
-                disabled={isUpvotePending || isConfirming || !!hasVoted || !isConnected || !!voteToastTxHash}
+                disabled={
+                  isUpvotePending ||
+                  isConfirming ||
+                  !!hasVoted ||
+                  !isConnected ||
+                  !!voteToastTxHash ||
+                  !GLITCH_REGISTRY_ADDRESS
+                }
                 data-celebrate={voteToastTxHash ? 'true' : 'false'}
               >
-                {voteToastTxHash
-                  ? '投票完了！'
-                  : isUpvotePending || isConfirming
-                  ? '投票中...'
-                  : hasVoted
-                  ? '投票済み'
-                  : '▲ 投票'}
+                {voteButtonLabel}
               </button>
             </section>
+
             {isConnected && chainId !== targetChainId && (
-              <p style={{ fontSize: '0.875rem', color: 'var(--c-text-muted)', marginTop: '0.5rem' }}>
-                現在のネットワーク: {currentChainLabel}（投票/スタンプは {targetChainLabel} が必要です）
-              </p>
+              <div className="glitch-action__status">
+                {copy.labels.networkStatus(currentChainLabel, targetChainLabel)}
+              </div>
             )}
             {!isConnected && (
-              <p style={{ fontSize: '0.875rem', color: 'var(--c-text-muted)', marginTop: '0.5rem' }}>
-                投票するにはウォレット接続が必要です。
-              </p>
+              <div className="glitch-action__status">{copy.labels.connectToVote}</div>
+            )}
+            {!isConfirmed && voteStatusTxLink && (
+              <div className="glitch-action__status">
+                <span>{copy.labels.voteSubmitted}</span>
+                <a href={voteStatusTxLink} target="_blank" rel="noopener noreferrer">
+                  {copy.labels.viewTx}
+                </a>
+              </div>
             )}
 
             <section className="glitch-vote" style={{ marginTop: 'var(--sp-sm)', flexWrap: 'wrap', gap: 'var(--sp-sm)' }}>
               <span
                 className={`tag-badge${stampTxHash ? ' tag-badge--success' : ''}`}
-                style={{
-                  fontSize: '0.875rem',
-                }}
+                style={{ fontSize: '0.875rem' }}
               >
-                {stampTxHash ? '刻印済み' : '未スタンプ'}
+                {stampTxHash ? copy.labels.stamped : copy.labels.notStamped}
               </span>
               {stampTxHash ? (
                 <a
@@ -448,27 +671,50 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
                   rel="noopener noreferrer"
                   style={{ whiteSpace: 'nowrap' }}
                 >
-                  Txを見る
+                  {copy.labels.viewTx}
                 </a>
               ) : (
                 <button
                   type="button"
                   className="glitch-vote__button"
                   onClick={handleStamp}
-                  disabled={!isConnected || !glitch.stamp_hash || !GLITCH_STAMP_ADDRESS || isStampPending || isStampConfirming}
+                  disabled={
+                    !isConnected ||
+                    !glitch.stamp_hash ||
+                    !GLITCH_STAMP_ADDRESS ||
+                    isStampPending ||
+                    isStampConfirming ||
+                    !!stampWriteTxHash
+                  }
                   style={{ whiteSpace: 'nowrap' }}
                 >
-                  {isStampPending || isStampConfirming ? 'スタンプ中...' : 'Baseにスタンプ'}
+                  {stampButtonLabel}
                 </button>
               )}
             </section>
             <p style={{ color: 'var(--c-text-muted)', fontSize: '0.875rem', margin: 'var(--sp-xs) 0 0' }}>
-              スタンプすると、この投稿が“存在した証拠（ハッシュ）”としてBaseに残ります。内容はオンチェーンに載りません。
+              {copy.labels.stampInfo}
             </p>
+            {!isStampConfirmed && stampStatusTxLink && !stampTxHash && (
+              <div className="glitch-action__status">
+                <span>{copy.labels.stampSubmitted}</span>
+                <a href={stampStatusTxLink} target="_blank" rel="noopener noreferrer">
+                  {copy.labels.viewTx}
+                </a>
+              </div>
+            )}
 
             {glitch.stamp_hash && (
-              <div style={{ marginTop: 'var(--sp-xs)', display: 'flex', gap: 'var(--sp-xs)', alignItems: 'center', flexWrap: 'wrap' }}>
-                <span style={{ color: 'var(--c-text-muted)', fontSize: '0.875rem' }}>stampHash</span>
+              <div
+                style={{
+                  marginTop: 'var(--sp-xs)',
+                  display: 'flex',
+                  gap: 'var(--sp-xs)',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                }}
+              >
+                <span style={{ color: 'var(--c-text-muted)', fontSize: '0.875rem' }}>{copy.labels.stampHash}</span>
                 <code style={{ fontSize: '0.75rem', wordBreak: 'break-all' }}>{glitch.stamp_hash}</code>
                 <button
                   type="button"
@@ -479,20 +725,39 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
                       await navigator.clipboard.writeText(glitch.stamp_hash!);
                     } catch (copyError) {
                       console.error('Copy error:', copyError);
-                      setError('stampHashのコピーに失敗しました。');
+                      setError(copy.errors.copyFailed);
                     }
                   }}
                 >
-                  コピー
+                  {copy.labels.copy}
                 </button>
               </div>
             )}
           </div>
         </section>
 
+        <div className="glitch-detail__nav">
+          {prevGlitchId ? (
+            <Link href={withLang(`/glitch/${prevGlitchId}`)} className="pagination__link">
+              {copy.labels.prevGlitch}
+            </Link>
+          ) : null}
+          {nextGlitchId ? (
+            <Link href={withLang(`/glitch/${nextGlitchId}`)} className="pagination__link">
+              {copy.labels.nextGlitch}
+            </Link>
+          ) : null}
+          <Link
+            href={withLang(`/glitch/random?excludeId=${glitch.id}&game=${encodeURIComponent(glitch.game_name)}`)}
+            className="pagination__link"
+          >
+            {copy.labels.randomGlitch}
+          </Link>
+        </div>
+
         {relatedGlitches.length > 0 && (
           <section className="glitch-related">
-            <h3 className="glitch-related__title">{glitch.game_name} の他のバグ</h3>
+            <h3 className="glitch-related__title">{copy.labels.related(glitch.game_name)}</h3>
             <div className="glitch-list">
               {relatedGlitches.map((related) => (
                 <GlitchCard key={related.id} glitch={related} compact />
@@ -501,20 +766,25 @@ export default function GlitchDetailClient({ glitch, relatedGlitches = [] }: Gli
           </section>
         )}
       </main>
-      {celebrate && <CelebrationBurst variant={celebrate} />}
+      {celebrate && (
+        <CelebrationBurst
+          variant={celebrate}
+          label={celebrate === 'vote' ? copy.labels.celebrateVote : copy.labels.celebrateStamp}
+        />
+      )}
       {voteToastTxHash && (
         <div className="toast" role="status" aria-live="polite">
-          <span>投票しました</span>
+          <span>{copy.labels.toastVote}</span>
           <a href={`${basescanBaseUrl}/tx/${voteToastTxHash}`} target="_blank" rel="noopener noreferrer" className="toast__link">
-            Txを見る
+            {copy.labels.viewTx}
           </a>
         </div>
       )}
       {stampToastTxHash && (
         <div className="toast" role="status" aria-live="polite">
-          <span>スタンプしました</span>
+          <span>{copy.labels.toastStamp}</span>
           <a href={`${basescanBaseUrl}/tx/${stampToastTxHash}`} target="_blank" rel="noopener noreferrer" className="toast__link">
-            Txを見る
+            {copy.labels.viewTx}
           </a>
         </div>
       )}

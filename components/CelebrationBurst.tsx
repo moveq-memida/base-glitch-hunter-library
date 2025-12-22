@@ -2,8 +2,14 @@
 
 import React from 'react';
 
-export default function CelebrationBurst({ variant }: { variant: 'vote' | 'stamp' }) {
-  const label = variant === 'vote' ? '投票完了' : 'スタンプ完了';
+interface CelebrationBurstProps {
+  variant: 'vote' | 'stamp';
+  label?: string;
+}
+
+export default function CelebrationBurst({ variant, label }: CelebrationBurstProps) {
+  const fallbackLabel = variant === 'vote' ? '投票完了' : 'スタンプ完了';
+  const displayLabel = label || fallbackLabel;
 
   return (
     <div className={`celebrate celebrate--${variant}`} role="presentation" aria-hidden="true">
@@ -12,7 +18,7 @@ export default function CelebrationBurst({ variant }: { variant: 'vote' | 'stamp
           <span key={index} className="celebrate__piece" style={{ ['--i' as never]: index } as React.CSSProperties} />
         ))}
       </div>
-      <div className="celebrate__label">{label}</div>
+      <div className="celebrate__label">{displayLabel}</div>
     </div>
   );
 }

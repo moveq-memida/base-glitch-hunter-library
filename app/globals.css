@@ -218,6 +218,41 @@ button, input, textarea, select {
   color: var(--c-text-main);
 }
 
+.search-skeleton {
+  display: flex;
+  gap: var(--sp-xs);
+  margin-bottom: var(--sp-lg);
+}
+
+.search-skeleton__input {
+  flex: 1;
+  height: 2.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.search-skeleton__button {
+  width: 96px;
+  height: 2.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.button-secondary {
+  padding: var(--sp-xs) var(--sp-sm);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-sm);
+  color: var(--c-text-main);
+  background: transparent;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background-color 0.2s;
+}
+
+.button-secondary:hover {
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+  background-color: rgba(139, 92, 246, 0.08);
+}
+
 /* Components: Popular Section */
 .popular-section {
   margin-bottom: var(--sp-lg);
@@ -238,6 +273,10 @@ button, input, textarea, select {
   display: flex;
   flex-direction: column;
   gap: var(--sp-md);
+}
+
+.popular-section__list--skeleton {
+  align-items: stretch;
 }
 
 @media (min-width: 768px) {
@@ -334,6 +373,33 @@ button, input, textarea, select {
   gap: var(--sp-md);
 }
 
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: var(--sp-lg) var(--sp-sm);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--c-border);
+  background: var(--c-surface);
+}
+
+.empty-state__title {
+  margin: 0 0 var(--sp-xs);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.empty-state__copy {
+  margin: 0 0 var(--sp-md);
+  color: var(--c-text-muted);
+}
+
+.empty-state__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-sm);
+}
+
 @media (min-width: 768px) {
   .glitch-list {
     grid-template-columns: repeat(2, 1fr);
@@ -388,6 +454,11 @@ button, input, textarea, select {
   line-height: 1.4;
 }
 
+.glitch-card__stamp-row {
+  min-height: 1.5rem;
+  margin-bottom: var(--sp-xs);
+}
+
 .glitch-card__tags {
   display: flex;
   flex-wrap: wrap;
@@ -421,10 +492,101 @@ button, input, textarea, select {
   display: inline-block;
 }
 
+.tag-badge--tx {
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+  background: rgba(139, 92, 246, 0.08);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.tag-badge--tx:hover {
+  background: rgba(139, 92, 246, 0.18);
+  color: var(--c-accent-hover);
+  border-color: var(--c-accent-hover);
+}
+
+.tag-badge__icon {
+  font-size: 0.7em;
+}
+
+.lang-toggle-group {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--c-border);
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.lang-toggle__item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  color: var(--c-text-muted);
+  cursor: pointer;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.lang-toggle__item:hover {
+  color: var(--c-text-main);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.lang-toggle__item[aria-current='true'] {
+  color: #fff;
+  background: var(--c-accent);
+}
+
 .glitch-card__vote {
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--c-accent);
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #202020 0%, #2a2a2a 50%, #202020 100%);
+  background-size: 200% 100%;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+.skeleton-card {
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--c-surface);
+}
+
+.skeleton-thumb {
+  height: 160px;
+}
+
+.skeleton-body {
+  padding: var(--sp-sm);
+}
+
+.skeleton-line {
+  height: 12px;
+  border-radius: 999px;
+  margin-bottom: var(--sp-xs);
+}
+
+.skeleton-line--short {
+  width: 60%;
+}
+
+@keyframes skeleton-pulse {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
 }
 
 /* Modifier for compact card */
@@ -452,6 +614,68 @@ button, input, textarea, select {
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--c-text-main);
+}
+
+.glitch-form__hint {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--c-text-muted);
+}
+
+.glitch-form__required,
+.glitch-form__optional {
+  margin-left: 0.5rem;
+  padding: 0 0.5rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.glitch-form__required {
+  color: var(--c-danger);
+  border: 1px solid var(--c-danger);
+}
+
+.glitch-form__optional {
+  color: var(--c-text-muted);
+  border: 1px solid var(--c-border);
+}
+
+.glitch-form__tag-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sp-xs);
+  margin-top: var(--sp-xs);
+}
+
+.glitch-form__tag-label {
+  font-size: 0.75rem;
+  color: var(--c-text-muted);
+}
+
+.glitch-tag-chip {
+  border: 1px solid var(--c-border);
+  background: var(--c-bg);
+  color: var(--c-text-muted);
+  border-radius: 999px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background-color 0.2s;
+}
+
+.glitch-tag-chip:hover {
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+}
+
+.glitch-tag-chip--active {
+  border-color: var(--c-accent);
+  color: var(--c-accent);
+  background: rgba(139, 92, 246, 0.15);
+  cursor: pointer;
 }
 
 .glitch-form input,
@@ -490,10 +714,31 @@ button, input, textarea, select {
   white-space: nowrap;
 }
 
+.wallet-button--avatar {
+  padding: 0.25rem;
+}
+
+.wallet-button__avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  object-fit: cover;
+  display: block;
+}
+
 @media (min-width: 768px) {
   .wallet-button {
     padding: var(--sp-xs) var(--sp-sm);
     font-size: 0.875rem;
+  }
+
+  .wallet-button--avatar {
+    padding: 0.3rem;
+  }
+
+  .wallet-button__avatar {
+    width: 28px;
+    height: 28px;
   }
 }
 
@@ -547,6 +792,16 @@ button, input, textarea, select {
 }
 .page-back-link::before {
   content: "← ";
+}
+
+.glitch-detail__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-xs);
+  align-items: center;
+  margin: var(--sp-md) 0;
+  padding-top: var(--sp-sm);
+  border-top: 1px solid var(--c-border);
 }
 
 .glitch-detail__title {
@@ -603,6 +858,7 @@ button, input, textarea, select {
   display: flex;
   align-items: center;
   gap: var(--sp-md);
+  justify-content: space-between;
   margin-top: var(--sp-lg);
   padding: var(--sp-md);
   background-color: var(--c-surface);
@@ -632,6 +888,22 @@ button, input, textarea, select {
 .glitch-vote__button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.glitch-action__status {
+  margin-top: var(--sp-xs);
+  font-size: 0.875rem;
+  color: var(--c-text-muted);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-xs);
+  flex-wrap: wrap;
+}
+
+.glitch-action__status a {
+  color: var(--c-accent);
+  text-decoration: underline;
+  font-weight: 600;
 }
 
 @keyframes glitch-vote-pulse {

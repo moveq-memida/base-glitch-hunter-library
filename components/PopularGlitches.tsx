@@ -1,8 +1,9 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
+import { useSearchParams } from 'next/navigation';
 import GlitchCard from './GlitchCard';
 import { glitchRegistryABI, GLITCH_REGISTRY_ADDRESS } from '@/lib/contracts';
 
@@ -20,6 +21,7 @@ interface Glitch {
   tags: string;
   video_url: string | null;
   onchain_glitch_id: number;
+  stamp_tx_hash?: string | null;
 }
 
 interface PopularGlitchesProps {
@@ -27,16 +29,44 @@ interface PopularGlitchesProps {
 }
 
 export default function PopularGlitches({ glitches }: PopularGlitchesProps) {
+  const searchParams = useSearchParams();
+  const langParam = searchParams.get('lang');
+  const envLang = (process.env.NEXT_PUBLIC_LANG || '').toLowerCase();
+  const fallbackLang = envLang === 'en' || envLang === 'ja' ? envLang : '';
+  const lang = (langParam === 'en' || langParam === 'ja' ? langParam : fallbackLang) || 'ja';
+  const isEnglish = lang === 'en';
   const [sortedGlitches, setSortedGlitches] = useState<(Glitch & { voteCount: number })[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
+
+  const labels = isEnglish
+    ? {
+        title: 'Popular glitches',
+        loading: 'Loading popular glitches',
+        votes: 'votes',
+        error: 'Failed to load popular glitches.',
+        retry: 'Retry',
+      }
+    : {
+        title: '人気のバグ',
+        loading: '人気のバグを読み込み中',
+        votes: '票',
+        error: '人気ランキングの取得に失敗しました。',
+        retry: '再読み込み',
+      };
 
   useEffect(() => {
     async function fetchVoteCounts() {
       const registryAddress = GLITCH_REGISTRY_ADDRESS;
       if (!registryAddress || glitches.length === 0) {
         setIsLoading(false);
+        setHasError(false);
         return;
       }
+
+      setIsLoading(true);
+      setHasError(false);
 
       try {
         const contracts = glitches.map((glitch) => ({
@@ -76,13 +106,18 @@ export default function PopularGlitches({ glitches }: PopularGlitchesProps) {
         setSortedGlitches(sorted);
       } catch (error) {
         console.error('Error fetching vote counts:', error);
+        setHasError(true);
       } finally {
         setIsLoading(false);
       }
     }
 
     fetchVoteCounts();
-  }, [glitches]);
+  }, [glitches, retryKey]);
+
+  const handleRetry = () => {
+    setRetryKey((prev) => prev + 1);
+  };
 
   if (!GLITCH_REGISTRY_ADDRESS || glitches.length === 0) {
     return null;
@@ -91,27 +126,53 @@ export default function PopularGlitches({ glitches }: PopularGlitchesProps) {
   if (isLoading) {
     return (
       <section className="popular-section">
-        <h3 className="popular-section__title">人気のバグ</h3>
-        <div className="loading-inline" style={{ minHeight: '4rem' }} aria-label="人気のバグを読み込み中">
-          <span className="loading-spinner" aria-hidden="true" />
+        <h3 className="popular-section__title">{labels.title}</h3>
+        <div className="popular-section__list popular-section__list--skeleton" aria-label={labels.loading}>
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div key={index} className="popular-section__item">
+              <div className="skeleton skeleton-line skeleton-line--short" />
+              <div className="skeleton-card">
+                <div className="skeleton skeleton-thumb" />
+                <div className="skeleton-body">
+                  <div className="skeleton skeleton-line" />
+                  <div className="skeleton skeleton-line skeleton-line--short" />
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
     );
   }
 
-  if (sortedGlitches.length === 0 || sortedGlitches.every(g => g.voteCount === 0)) {
+  if (hasError) {
+    return (
+      <section className="popular-section">
+        <h3 className="popular-section__title">{labels.title}</h3>
+        <div className="empty-state">
+          <p className="empty-state__copy">{labels.error}</p>
+          <div className="empty-state__actions">
+            <button type="button" className="button-secondary" onClick={handleRetry}>
+              {labels.retry}
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (sortedGlitches.length === 0 || sortedGlitches.every((g) => g.voteCount === 0)) {
     return null;
   }
 
   return (
     <section className="popular-section">
-      <h3 className="popular-section__title">人気のバグ</h3>
+      <h3 className="popular-section__title">{labels.title}</h3>
       <div className="popular-section__list">
         {sortedGlitches.map((glitch, index) => (
           <div key={glitch.id} className="popular-section__item">
             <div className="popular-section__item-header">
               <span className="popular-section__rank">#{index + 1}</span>
-              <span className="popular-section__votes">▲ {glitch.voteCount} 票</span>
             </div>
             <GlitchCard glitch={glitch} compact />
           </div>
