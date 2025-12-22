@@ -49,10 +49,10 @@ export default function GlitchCard({ glitch, compact = false }: GlitchCardProps)
   const shouldIncludeLang = Boolean(langParam || fallbackLang);
   const langSuffix = shouldIncludeLang ? `?lang=${lang}` : '';
   const tags = glitch.tags ? glitch.tags.split(',').map(tag => tag.trim()) : [];
-  const thumbnailUrl = getYouTubeThumbnail(glitch.video_url);
+  const thumbnailUrl = getYouTubeThumbnail(glitch.video_url) || '';
   const [thumbError, setThumbError] = useState(false);
   const stampTxUrl = glitch.stamp_tx_hash ? `https://basescan.org/tx/${glitch.stamp_tx_hash}` : null;
-  const showThumbnail = Boolean(thumbnailUrl) && !thumbError;
+  const showThumbnail = thumbnailUrl.length > 0 && !thumbError;
 
   return (
     <Link href={`/glitch/${glitch.id}${langSuffix}`} className={`glitch-card ${compact ? 'glitch-card--compact' : ''}`}>
