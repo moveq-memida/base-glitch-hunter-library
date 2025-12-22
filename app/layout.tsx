@@ -38,6 +38,9 @@ export const metadata: Metadata = {
     description: 'Post, vote, and stamp legendary game glitches with a hash proof on Base mainnet.',
     images: [`${appUrl}/og.png`],
   },
+  verification: {
+    google: '-OYHm4HHiEAQivWnfq5fF1Shm_Lks1Do7JyNgbMsNV8',
+  },
   other: {
     'base:app_id': '693b320ce6be54f5ed71d6a6',
     'fc:miniapp': JSON.stringify({
