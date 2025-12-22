@@ -725,6 +725,7 @@ button, input, textarea, select {
   object-fit: cover;
   display: block;
   border: 1px solid var(--c-success);
+  filter: brightness(1.08) saturate(1.05);
 }
 
 @media (min-width: 768px) {
@@ -756,6 +757,13 @@ button, input, textarea, select {
 
 .wallet-button--connected.wallet-button--avatar {
   border-color: transparent;
+}
+
+.wallet-button--connected.wallet-button--avatar:hover,
+.wallet-button--connected.wallet-button--avatar:focus-visible,
+.wallet-button--connected.wallet-button--avatar:active {
+  border-color: transparent;
+  color: var(--c-success);
 }
 
 .wallet-button--connected:hover {
