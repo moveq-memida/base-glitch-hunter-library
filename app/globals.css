@@ -724,6 +724,7 @@ button, input, textarea, select {
   border-radius: 999px;
   object-fit: cover;
   display: block;
+  border: 1px solid var(--c-success);
 }
 
 @media (min-width: 768px) {
@@ -751,6 +752,10 @@ button, input, textarea, select {
   border-style: solid;
   border-color: var(--c-success);
   color: var(--c-success);
+}
+
+.wallet-button--connected.wallet-button--avatar {
+  border-color: transparent;
 }
 
 .wallet-button--connected:hover {

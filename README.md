@@ -164,6 +164,25 @@ npx prisma migrate dev # Create and apply migrations
 npx prisma studio      # Open Prisma Studio (database GUI)
 ```
 
+### Seeding Content (English, YouTube search)
+
+This script adds new posts only (it does not delete existing posts).
+
+```bash
+# Dry run: search YouTube and list candidate URLs
+node scripts/seed-prod-glitches-en.mjs --dry-run
+
+# Execute: create onchain + DB entries
+$env:SEEDER_PRIVATE_KEY="0x..."; node scripts/seed-prod-glitches-en.mjs --execute
+```
+
+Optional env vars:
+
+```env
+SEED_TARGET_URL="https://base-glitch-hunter-library.vercel.app"
+BASE_RPC_URL="https://mainnet.base.org"
+```
+
 ## How It Works
 
 ### Submitting a Glitch

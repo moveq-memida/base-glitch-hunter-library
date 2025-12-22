@@ -41,6 +41,8 @@ export default function Header({ actionText, actionHref }: HeaderProps) {
     context?.user?.username ||
     'Profile avatar';
   const showAvatar = isConnected && avatarUrl.length > 0;
+  const isMiniApp = Boolean(context);
+  const shouldDisableWalletAction = isMiniApp && isConnected;
 
   const labels = isEnglish
     ? {
@@ -72,8 +74,10 @@ export default function Header({ actionText, actionHref }: HeaderProps) {
         {isConnected ? (
           <button
             className={`wallet-button wallet-button--connected${showAvatar ? ' wallet-button--avatar' : ''}`}
-            onClick={() => disconnect()}
-            title={labels.disconnectTitle}
+            onClick={shouldDisableWalletAction ? undefined : () => disconnect()}
+            title={shouldDisableWalletAction ? undefined : labels.disconnectTitle}
+            disabled={shouldDisableWalletAction}
+            aria-disabled={shouldDisableWalletAction}
           >
             {showAvatar ? (
               <img
