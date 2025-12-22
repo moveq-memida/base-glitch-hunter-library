@@ -595,6 +595,11 @@ button, input, textarea, select {
 }
 .glitch-card--compact .glitch-card__title {
   font-size: 1rem;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  min-height: calc(1.4em * 2);
 }
 
 /* Components: Form */
