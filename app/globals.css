@@ -301,6 +301,7 @@ button, input, textarea, select {
   .popular-section__item {
     flex: 1;
     text-align: center;
+    min-width: 0;
   }
 
   .popular-section__item-header {
@@ -606,6 +607,10 @@ button, input, textarea, select {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.glitch-card--compact .glitch-card__body {
+  min-width: 0;
 }
 
 /* Components: Form */
