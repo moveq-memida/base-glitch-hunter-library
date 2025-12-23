@@ -602,6 +602,12 @@ button, input, textarea, select {
   min-height: calc(1.4em * 2);
 }
 
+.glitch-card--compact .glitch-card__meta {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Components: Form */
 .glitch-form {
   display: flex;
