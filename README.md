@@ -7,7 +7,7 @@ A Web3 dApp for discovering, submitting, and voting on video game glitches (bugs
 - **Frontend**: Next.js 16 (App Router) + TypeScript + TailwindCSS
 - **Web3**: wagmi + viem for blockchain interactions
 - **Database**: PostgreSQL + Prisma ORM
-- **Smart Contract**: Solidity + Hardhat (Base Sepolia -> Base Mainnet)
+- **Smart Contract**: Solidity + Hardhat (Base mainnet)
 
 ## Project Structure
 
@@ -35,7 +35,6 @@ base-glitch-hunter-library/
 - Node.js 18+ and npm
 - PostgreSQL database (or use Prisma's local dev database)
 - MetaMask or compatible Web3 wallet
-- Base Sepolia testnet ETH (for testing)
 
 ## Setup Instructions
 
@@ -62,7 +61,6 @@ Required environment variables:
 DATABASE_URL="your_postgres_connection_string"
 
 # Base Network RPC URLs (defaults provided)
-BASE_SEPOLIA_RPC_URL="https://sepolia.base.org"
 BASE_MAINNET_RPC_URL="https://mainnet.base.org"
 
 # Optional: default UI language when ?lang is not provided ("ja" or "en")
@@ -109,14 +107,10 @@ npm run compile
 # Run tests
 npm test
 
-# Deploy to Base Sepolia (testnet)
-npm run deploy:sepolia
-
 # Deploy to Base Mainnet (production)
 npm run deploy:mainnet
 
 # Deploy GlitchStamp (hash stamping)
-npm run deploy:stamp:sepolia
 npm run deploy:stamp:mainnet
 ```
 
@@ -152,7 +146,6 @@ npm run lint      # Run ESLint
 cd contracts
 npm run compile         # Compile Solidity contracts
 npm test               # Run contract tests
-npm run deploy:sepolia # Deploy to Base Sepolia testnet
 npm run deploy:mainnet # Deploy to Base mainnet
 ```
 
@@ -276,10 +269,6 @@ Then:
 
 - `stampHash = keccak256(toBytes(payload))` (see `lib/stamp.ts`)
 
-## Testing
-
-Get testnet ETH from the [Base Sepolia Faucet](https://www.coinbase.com/faucets/base-ethereum-goerli-faucet).
-
 ## Production Deployment
 
 1. Deploy smart contract to Base mainnet
@@ -308,8 +297,7 @@ This app works as a Base / Farcaster Mini App.
 NEXT_PUBLIC_APP_URL="https://your-app.vercel.app"
 
 # Network configuration
-NEXT_PUBLIC_CHAIN="mainnet"  # or "sepolia" for testnet
-NEXT_PUBLIC_BASE_RPC_URL="https://mainnet.base.org"  # or "https://sepolia.base.org"
+NEXT_PUBLIC_BASE_RPC_URL="https://mainnet.base.org"
 NEXT_PUBLIC_LANG="en"  # or "ja"
 
 # Farcaster Account Association (from Base Build tool)

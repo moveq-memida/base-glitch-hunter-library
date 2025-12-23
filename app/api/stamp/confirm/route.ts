@@ -2,15 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { GLITCH_STAMP_ADDRESS, glitchStampABI } from '@/lib/contracts';
 import { createPublicClient, decodeEventLog, http, isHex } from 'viem';
-import { base, baseSepolia } from 'viem/chains';
-
-function getChainConfig() {
-  const env = process.env.NEXT_PUBLIC_CHAIN;
-  const isSepolia = env === 'sepolia';
-  const chain = isSepolia ? baseSepolia : base;
-  const rpcUrl = isSepolia ? process.env.BASE_SEPOLIA_RPC_URL : process.env.BASE_MAINNET_RPC_URL;
-  return { chain, rpcUrl };
-}
+import { base } from 'viem/chains';
 
 export async function POST(request: NextRequest) {
   try {
@@ -50,9 +42,9 @@ export async function POST(request: NextRequest) {
     let verifiedAt: Date | null = null;
 
     try {
-      const { chain, rpcUrl } = getChainConfig();
+      const rpcUrl = process.env.BASE_MAINNET_RPC_URL || process.env.NEXT_PUBLIC_BASE_RPC_URL;
       const publicClient = createPublicClient({
-        chain,
+        chain: base,
         transport: rpcUrl ? http(rpcUrl) : http(),
       });
 

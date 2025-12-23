@@ -1,17 +1,18 @@
 import { http, createConfig } from 'wagmi';
-import { base, baseSepolia } from 'wagmi/chains';
+import { base } from 'wagmi/chains';
 import { injected } from 'wagmi/connectors';
 
+const baseRpcUrl = process.env.NEXT_PUBLIC_BASE_RPC_URL || base.rpcUrls.default.http[0];
+
 export const config = createConfig({
-  chains: [base, baseSepolia],
+  chains: [base],
   connectors: [
     injected({
       shimDisconnect: true,
     }),
   ],
   transports: {
-    [base.id]: http(),
-    [baseSepolia.id]: http(),
+    [base.id]: http(baseRpcUrl),
   },
   ssr: true,
 });

@@ -10,8 +10,9 @@ import {
   useWaitForTransactionReceipt,
   useChainId,
   useSwitchChain,
+  usePublicClient,
 } from 'wagmi';
-import { base, baseSepolia } from 'wagmi/chains';
+import { base } from 'wagmi/chains';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlitchCard from '@/components/GlitchCard';
@@ -251,20 +252,24 @@ export default function GlitchDetailClient({
   const chainId = useChainId();
   const { switchChain } = useSwitchChain();
 
-  const targetChainId = process.env.NEXT_PUBLIC_CHAIN === 'sepolia' ? baseSepolia.id : base.id;
-  const basescanBaseUrl =
-    process.env.NEXT_PUBLIC_CHAIN === 'sepolia' ? 'https://sepolia.basescan.org' : 'https://basescan.org';
-  const targetChainLabel = targetChainId === baseSepolia.id ? 'Base Sepolia' : 'Base mainnet';
+  const targetChainId = base.id;
+  const publicClient = usePublicClient({ chainId: targetChainId });
+  const basescanBaseUrl = 'https://basescan.org';
+  const targetChainLabel = 'Base mainnet';
   const currentChainLabel =
     chainId === base.id
       ? 'Base mainnet'
-      : chainId === baseSepolia.id
-      ? 'Base Sepolia'
       : chainId === 1
       ? 'Ethereum mainnet'
       : `chainId ${chainId}`;
 
-  const { writeContract: writeUpvote, data: upvoteWriteTxHash, isPending: isUpvotePending } = useWriteContract();
+  const {
+    writeContract: writeUpvote,
+    data: upvoteWriteTxHash,
+    isPending: isUpvotePending,
+    error: upvoteWriteError,
+    reset: resetUpvoteWrite,
+  } = useWriteContract();
   const {
     writeContract: writeStamp,
     data: stampWriteTxHash,
@@ -338,12 +343,29 @@ export default function GlitchDetailClient({
     }
 
     try {
-      writeUpvote({
-        address: GLITCH_REGISTRY_ADDRESS,
-        abi: glitchRegistryABI,
-        functionName: 'upvote',
-        args: [BigInt(glitch.onchain_glitch_id)],
-      });
+      const { data: latestHasVoted } = await refetchHasVoted();
+      if (latestHasVoted) {
+        setError(copy.errors.alreadyVoted);
+        return;
+      }
+
+      if (publicClient) {
+        const { request } = await publicClient.simulateContract({
+          address: GLITCH_REGISTRY_ADDRESS,
+          abi: glitchRegistryABI,
+          functionName: 'upvote',
+          args: [BigInt(glitch.onchain_glitch_id)],
+          account: address,
+        });
+        writeUpvote(request);
+      } else {
+        writeUpvote({
+          address: GLITCH_REGISTRY_ADDRESS,
+          abi: glitchRegistryABI,
+          functionName: 'upvote',
+          args: [BigInt(glitch.onchain_glitch_id)],
+        });
+      }
     } catch (upvoteError) {
       console.error('Upvote error:', upvoteError);
       setError(copy.errors.voteFailed);
@@ -393,6 +415,19 @@ export default function GlitchDetailClient({
     console.error('Upvote confirmation error:', confirmError);
     setError(copy.errors.voteConfirmFailed(targetChainLabel));
   }, [isConfirmError, confirmError, targetChainLabel, copy.errors]);
+
+  useEffect(() => {
+    if (!upvoteWriteError) return;
+    const message = upvoteWriteError.message || 'Transaction failed';
+    if (message.includes('Already voted')) {
+      setError(copy.errors.alreadyVoted);
+    } else if (message.includes('User rejected') || message.includes('user rejected')) {
+      setError(copy.errors.txCanceled);
+    } else {
+      setError(copy.errors.voteFailed);
+    }
+    resetUpvoteWrite();
+  }, [upvoteWriteError, resetUpvoteWrite, copy.errors]);
 
   const handleStamp = async () => {
     setError(null);
