@@ -3,7 +3,7 @@ import type { MetadataRoute } from 'next';
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://base-glitch-hunter-library.vercel.app';
 
 export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600; // 1時間キャッシュ
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
