@@ -100,7 +100,7 @@ export default function PopularGlitches({ glitches }: PopularGlitchesProps) {
         }));
 
         const sorted = glitchesWithVotes
-          .sort((a, b) => b.voteCount - a.voteCount)
+          .sort((a, b) => b.voteCount - a.voteCount || b.id - a.id)
           .slice(0, 3);
 
         setSortedGlitches(sorted);
@@ -161,7 +161,7 @@ export default function PopularGlitches({ glitches }: PopularGlitchesProps) {
     );
   }
 
-  if (sortedGlitches.length === 0 || sortedGlitches.every((g) => g.voteCount === 0)) {
+  if (sortedGlitches.length === 0) {
     return null;
   }
 
