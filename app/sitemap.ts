@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 
-const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://base-glitch-hunter-library.vercel.app';
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://memida.xyz';
 
 export const runtime = 'nodejs';
 export const revalidate = 3600; // 1時間キャッシュ

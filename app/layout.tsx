@@ -3,7 +3,7 @@ import Script from 'next/script';
 import './globals.css';
 import { Providers } from '@/components/Providers';
 
-const appUrl = 'https://base-glitch-hunter-library.vercel.app';
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://memida.xyz';
 
 export const metadata: Metadata = {
   metadataBase: new URL(appUrl),

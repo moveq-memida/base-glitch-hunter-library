@@ -6,7 +6,7 @@
  *   $env:SEEDER_PRIVATE_KEY="0x..."; node scripts/seed-prod-glitches-en.mjs --execute
  *
  * Optional:
- *   $env:SEED_TARGET_URL="https://base-glitch-hunter-library.vercel.app"
+ *   $env:SEED_TARGET_URL="https://memida.xyz"
  *   $env:BASE_RPC_URL="https://mainnet.base.org"
  *   node scripts/seed-prod-glitches-en.mjs --dry-run
  */
@@ -124,7 +124,7 @@ const env = { ...envFromFiles, ...process.env };
 const execute = getArgFlag('--execute');
 const dryRun = getArgFlag('--dry-run') || !execute;
 
-const seedTargetUrl = (env.SEED_TARGET_URL || env.NEXT_PUBLIC_APP_URL || 'https://base-glitch-hunter-library.vercel.app').replace(/\/$/, '');
+const seedTargetUrl = (env.SEED_TARGET_URL || env.NEXT_PUBLIC_APP_URL || 'https://memida.xyz').replace(/\/$/, '');
 const registryAddress = env.NEXT_PUBLIC_GLITCH_REGISTRY_ADDRESS || env.GLITCH_REGISTRY_ADDRESS;
 const rpcUrl = env.BASE_RPC_URL || env.NEXT_PUBLIC_BASE_RPC_URL || base.rpcUrls.default.http[0];
 

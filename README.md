@@ -172,7 +172,7 @@ $env:SEEDER_PRIVATE_KEY="0x..."; node scripts/seed-prod-glitches-en.mjs --execut
 Optional env vars:
 
 ```env
-SEED_TARGET_URL="https://base-glitch-hunter-library.vercel.app"
+SEED_TARGET_URL="https://memida.xyz"
 BASE_RPC_URL="https://mainnet.base.org"
 ```
 

@@ -115,7 +115,7 @@ export default async function GlitchDetailPage({ params }: { params: Promise<{ i
   const prevGlitchId = glitch ? await getPrevGlitchId(glitch.id) : null;
   const nextGlitchId = glitch ? await getNextGlitchId(glitch.id) : null;
   const appBaseUrl =
-    process.env.NEXT_PUBLIC_APP_URL || 'https://base-glitch-hunter-library.vercel.app';
+    process.env.NEXT_PUBLIC_APP_URL || 'https://memida.xyz';
   const canonicalUrl = glitch ? `${appBaseUrl}/glitch/${glitch.id}` : '';
   const thumbnailUrl = glitch ? getYouTubeThumbnail(glitch.video_url) : null;
   const publishedAt = glitch?.created_at ? new Date(glitch.created_at).toISOString() : undefined;
