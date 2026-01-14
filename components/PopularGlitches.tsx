@@ -7,10 +7,19 @@ import { useSearchParams } from 'next/navigation';
 import GlitchCard from './GlitchCard';
 import { glitchRegistryABI, GLITCH_REGISTRY_ADDRESS } from '@/lib/contracts';
 
-const rpcUrl = process.env.NEXT_PUBLIC_BASE_RPC_URL;
+const defaultRpcUrl = base.rpcUrls.default.http[0];
+const rpcUrl = (() => {
+  const candidate = process.env.NEXT_PUBLIC_BASE_RPC_URL?.trim();
+  if (!candidate) return defaultRpcUrl;
+  const lower = candidate.toLowerCase();
+  if (lower.includes('alchemy.com') || lower.includes('alchemyapi.io')) {
+    return defaultRpcUrl;
+  }
+  return candidate;
+})();
 const publicClient = createPublicClient({
   chain: base,
-  transport: rpcUrl ? http(rpcUrl) : http(),
+  transport: http(rpcUrl),
 });
 
 interface Glitch {
