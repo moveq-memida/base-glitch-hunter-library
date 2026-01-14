@@ -1,6 +1,8 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { WagmiProvider } from 'wagmi';
+import { config } from '@/lib/wagmi';
 import { useState, type ReactNode } from 'react';
 import { MiniKitProvider } from '@/components/MiniKitProvider';
 
@@ -20,9 +22,11 @@ export function Providers({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <MiniKitProvider>
-        {children}
-      </MiniKitProvider>
+      <WagmiProvider config={config}>
+        <MiniKitProvider>
+          {children}
+        </MiniKitProvider>
+      </WagmiProvider>
     </QueryClientProvider>
   );
 }
