@@ -43,6 +43,8 @@ export default function Header({ actionText, actionHref }: HeaderProps) {
   const showAvatar = isConnected && avatarUrl.length > 0;
   const isMiniApp = Boolean(context);
   const shouldDisableWalletAction = isMiniApp && isConnected;
+  const hasInjectedProvider =
+    typeof window !== 'undefined' && Boolean((window as Window & { ethereum?: unknown }).ethereum);
 
   const labels = isEnglish
     ? {
@@ -57,10 +59,22 @@ export default function Header({ actionText, actionHref }: HeaderProps) {
       };
 
   const handleConnect = () => {
+    const baseAccountConnector = connectors.find((c) => c.id === 'baseAccount');
     const injectedConnector = connectors.find((c) => c.id === 'injected');
-    if (injectedConnector) {
+
+    if (isMiniApp && baseAccountConnector) {
+      connect({ connector: baseAccountConnector });
+      return;
+    }
+    if (hasInjectedProvider && injectedConnector) {
       connect({ connector: injectedConnector });
-    } else if (connectors.length > 0) {
+      return;
+    }
+    if (baseAccountConnector) {
+      connect({ connector: baseAccountConnector });
+      return;
+    }
+    if (connectors.length > 0) {
       connect({ connector: connectors[0] });
     }
   };

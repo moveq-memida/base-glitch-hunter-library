@@ -1,6 +1,6 @@
 import { http, createConfig } from 'wagmi';
 import { base } from 'wagmi/chains';
-import { baseAccount } from 'wagmi/connectors';
+import { baseAccount, injected } from 'wagmi/connectors';
 
 const defaultRpcUrl = base.rpcUrls.default.http[0];
 
@@ -20,6 +20,9 @@ export const config = createConfig({
   chains: [base],
   connectors: [
     baseAccount(),
+    injected({
+      shimDisconnect: true,
+    }),
   ],
   transports: {
     [base.id]: http(baseRpcUrl),
