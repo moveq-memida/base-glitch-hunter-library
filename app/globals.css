@@ -146,6 +146,26 @@ button, input, textarea, select {
   text-underline-offset: 4px;
 }
 
+.page-footer__links {
+  display: flex;
+  justify-content: center;
+  gap: var(--sp-sm);
+  flex-wrap: wrap;
+}
+
+.page-footer__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--sp-md);
+}
+
+.page-footer__badge-img {
+  display: block;
+  width: 180px;
+  height: 48px;
+}
+
 /* Components: Page Intro */
 .page-intro {
   margin-bottom: var(--sp-lg);
