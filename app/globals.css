@@ -2263,3 +2263,123 @@ code {
   font-size: 1rem;
   color: var(--text-dim);
 }
+
+/* Profile Editor */
+.profile-editor-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.profile-editor {
+  background: var(--bg-dark);
+  border: 2px solid var(--accent-gold);
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.profile-editor__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 2px solid var(--border-light);
+}
+
+.profile-editor__header h3 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.875rem;
+  color: var(--accent-gold);
+  margin: 0;
+}
+
+.profile-editor__close {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  line-height: 1;
+}
+
+.profile-editor__close:hover {
+  color: var(--accent-red);
+}
+
+.profile-editor__form {
+  padding: 1rem;
+}
+
+.profile-editor__actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+.profile-editor__notice {
+  color: var(--text-dim);
+  font-size: 0.875rem;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.profile-edit-button {
+  margin-top: 1rem;
+}
+
+/* Button styles */
+.button-primary {
+  background: var(--accent-gold);
+  border: 2px solid var(--accent-gold);
+  color: var(--bg-dark);
+  padding: 0.75rem 1.5rem;
+  font-family: 'VT323', monospace;
+  font-size: 1.125rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.button-primary:hover {
+  background: transparent;
+  color: var(--accent-gold);
+}
+
+.button-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.button-secondary {
+  background: transparent;
+  border: 2px solid var(--border-light);
+  color: var(--text-main);
+  padding: 0.75rem 1.5rem;
+  font-family: 'VT323', monospace;
+  font-size: 1.125rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.button-secondary:hover {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+
+.button-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import UserCard from '@/components/UserCard';
 import BadgeGrid from '@/components/BadgeGrid';
 import GlitchCard from '@/components/GlitchCard';
+import ProfileClient from './ProfileClient';
 import { prisma } from '@/lib/prisma';
 import { type UserTier } from '@/lib/ranking';
 
@@ -106,6 +107,14 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
         </Link>
 
         <UserCard user={userData} showProgress />
+
+        <ProfileClient
+          userId={user.id}
+          displayName={user.display_name}
+          bio={user.bio}
+          avatarUrl={user.avatar_url}
+          walletAddress={user.wallet_address}
+        />
 
         <section className="profile-section">
           <h3 className="profile-section__title">Badges</h3>
