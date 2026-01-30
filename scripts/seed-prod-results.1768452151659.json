@@ -1,0 +1,407 @@
+{
+  "createdAt": "2026-01-15T04:42:31.664Z",
+  "seedTargetUrl": "https://memida.xyz",
+  "registryAddress": "0xd3D49560C90A65Afd0819B7fa3b8B50542e02789",
+  "results": [
+    {
+      "dbId": 1,
+      "onchainGlitchId": 135,
+      "contentHash": "0xfe85d6c813ffffc98a7247df3ddcd76d84ee08287266c49235ff99f6d78f614a",
+      "txHash": "0x12502d6bdb41850cc06307004a9e29bfdd93cc2aa3e35d7511d50c0397ce823f",
+      "videoUrl": "https://www.youtube.com/watch?v=tx9lmev-Ito",
+      "title": "Backwards long jump through the staircase"
+    },
+    {
+      "dbId": 2,
+      "onchainGlitchId": 136,
+      "contentHash": "0x1e2592d1f5cb4fe6ada1c913717bd7afc9c2211251b9f753c61091af4d22a370",
+      "txHash": "0x13691d44988abe6dee3fe2c62fe2e7e657e1e388042c5cc00d4ac84ba50e39cd",
+      "videoUrl": "https://www.youtube.com/watch?v=OGQplWHCCbo",
+      "title": "Giant Space Program launch"
+    },
+    {
+      "dbId": 3,
+      "onchainGlitchId": 137,
+      "contentHash": "0xb2262c2b801e644800e7610d68c37d913f7e6280782725ce59d059cfe3b24e14",
+      "txHash": "0x7082db9dfe1b0eea66cae6dcb1cea698b49f43b721df91ee9d62c6c8f2889fb0",
+      "videoUrl": "https://www.youtube.com/watch?v=DOR-XL_N9HE",
+      "title": "Swing Set Glitch launch"
+    },
+    {
+      "dbId": 4,
+      "onchainGlitchId": 138,
+      "contentHash": "0xde1fdcdb5e14f3e9abe3a233c152289a9113901509b5281e6ece0155dda34970",
+      "txHash": "0x0a07295e005f88036c47dd256ade7961586b7d208652238f54232c1832deeee2",
+      "videoUrl": "https://www.youtube.com/watch?v=Nh3X8zSmTwY",
+      "title": "MissingNo. item duplication"
+    },
+    {
+      "dbId": 5,
+      "onchainGlitchId": 139,
+      "contentHash": "0x4839bc8d1d578611c3635e9928c4971a3035b7d4b543093dbf36938d6cc71808",
+      "txHash": "0x212dd0b6e2445f5466e49f434016b96031ec5f576ed14668b5e7998f2f84c082",
+      "videoUrl": "https://www.youtube.com/watch?v=sW80OYl5Spw",
+      "title": "Moon jump"
+    },
+    {
+      "dbId": 6,
+      "onchainGlitchId": 140,
+      "contentHash": "0xb2e35e718a4d03b84e62564f8d429394b3dba3185c533d6439c965e9e43817ef",
+      "txHash": "0x83b71d33c931d933e2034c0c1e85bca0606fa2eec9ed3be5cb1afa86b480cb5f",
+      "videoUrl": "https://www.youtube.com/watch?v=l2hMhMN0i28",
+      "title": "Item duplication early in the game"
+    },
+    {
+      "dbId": 7,
+      "onchainGlitchId": 141,
+      "contentHash": "0x41069a1111f06369355fd40994a18b6984493492b975e919114c185863f5aa7d",
+      "txHash": "0x4d269d3d9b0f934c2befe9eb239ea48514026daa7c21183ce659b89852666be5",
+      "videoUrl": "https://www.youtube.com/watch?v=YZR5ehtm_e4",
+      "title": "Far Lands terrain collapse"
+    },
+    {
+      "dbId": 8,
+      "onchainGlitchId": 142,
+      "contentHash": "0x8ef5e887e172b5258bc874c2a83702917f711008d49acacbf294bf9b17cd3127",
+      "txHash": "0x3c439dd30b8fbf6a3dd70537429c6281dd8b3cabf4e7d6a532370e5cddf10895",
+      "videoUrl": "https://www.youtube.com/watch?v=QNy8lbVIFjI",
+      "title": "Super bounce out of bounds"
+    },
+    {
+      "dbId": 9,
+      "onchainGlitchId": 143,
+      "contentHash": "0x8e6c3a6a44c328594bb9b0e9937eee365772384bc66de64b77e2c4719fb78362",
+      "txHash": "0xa8c761e41a3c72fada166c9faea25449ab5f38d9aa9b4583800e31e5ef2be714",
+      "videoUrl": "https://www.youtube.com/watch?v=KaQMSrZql38",
+      "title": "Wrong warp"
+    },
+    {
+      "dbId": 10,
+      "onchainGlitchId": 144,
+      "contentHash": "0xbca7371a67e8687b8754734244f05512d3fd289d558feeb5bcf9f1b39f87dc3a",
+      "txHash": "0x8333698e822a458f77002db9f44cd69b3ab7ca0c0371b8b2617d1959c3017632",
+      "videoUrl": "https://www.youtube.com/watch?v=cXJf_mkNB2g",
+      "title": "Pomeg berry corruption"
+    },
+    {
+      "dbId": 11,
+      "onchainGlitchId": 145,
+      "contentHash": "0xf1c893ddcec6cd6623971bdaca921e044af74a822438fd93728f3ecd2f2b29cf",
+      "txHash": "0xbd69b131d656f0a8a81cb92b599bf4a9abfd907bbcd9b1c4a442443bed482722",
+      "videoUrl": "https://www.youtube.com/watch?v=RPE6i9zYxps",
+      "title": "Out of bounds clip"
+    },
+    {
+      "dbId": 12,
+      "onchainGlitchId": 146,
+      "contentHash": "0x6daf337c191a90b3eb5cb6d76e7d750e17005a63762f81b8aa574aa04f687498",
+      "txHash": "0x9a1149385f8462371bf16e053ac69a08d4b471e15423ba4203a4809237edf029",
+      "videoUrl": "https://www.youtube.com/watch?v=fTten08_H1s",
+      "title": "Infinite jump"
+    },
+    {
+      "dbId": 13,
+      "onchainGlitchId": 147,
+      "contentHash": "0x111cce99d4e657abb16b3ad9d8fd84e03f111d5c2cad479f9d6fb4848dff039f",
+      "txHash": "0x78bdd11e58cd34de8bfeffe0860384c226b82925698c0e9c5a14b46d6aa64265",
+      "videoUrl": "https://www.youtube.com/watch?v=N-fRRJ6mBrk",
+      "title": "Clip through geometry"
+    },
+    {
+      "dbId": 14,
+      "onchainGlitchId": 148,
+      "contentHash": "0x71afbea11cab7551ecfcade74ecdc1fa2b107e9c229bbe7cf98518e1462b2d1d",
+      "txHash": "0x3206969bd04f3305f12ad732c4998bead0737893840982b0beea8fc720b9a9b5",
+      "videoUrl": "https://www.youtube.com/watch?v=x5cg2Km_uEU",
+      "title": "Physics launch chain"
+    },
+    {
+      "dbId": 15,
+      "onchainGlitchId": 149,
+      "contentHash": "0x52db8104e1f0bd920681c32fcf5e42434d2c2809fdd3ed3ded14521baa902f58",
+      "txHash": "0x7dcec1f264677e65b654507cb5c724311736b7e993891d5c8ce999c62bd67943",
+      "videoUrl": "https://www.youtube.com/watch?v=4J7uFhKn_xU",
+      "title": "Horse launch glitch"
+    },
+    {
+      "dbId": 16,
+      "onchainGlitchId": 150,
+      "contentHash": "0x9a1cc5fce3785a3322b264da9b9b42766eeec7f5ee75564264092f45c6f7754f",
+      "txHash": "0x9e3001edea054db73c9be0ecfb8be506ef06df052cadf1613f1c5174df1b9382",
+      "videoUrl": "https://www.youtube.com/watch?v=fixmBwon3jk",
+      "title": "Memory storage setup"
+    },
+    {
+      "dbId": 17,
+      "onchainGlitchId": 151,
+      "contentHash": "0xeb3af3e61d2d57a061a20bbb2f60363b68e927c9b5f09fcd10e855c52f0d389f",
+      "txHash": "0x2e94bccf673d93902c57f7958e2c0203d00b3181fb14511de41c09dec3c71f89",
+      "videoUrl": "https://www.youtube.com/watch?v=C63B-EG7pY4",
+      "title": "Revolver Ocelot knockback launch"
+    },
+    {
+      "dbId": 18,
+      "onchainGlitchId": 152,
+      "contentHash": "0x20b9f22545708e586a5d49eeac05d72d7eb3c8ac53e355800d8ef9c9ceba5079",
+      "txHash": "0xc59e286e50f0cc3b4209d97ce73397b983c12bf4ab3e412b8ae50deaa7a260cb",
+      "videoUrl": "https://www.youtube.com/watch?v=fyVAEw3Zywg",
+      "title": "Rocket jump to unintended spots"
+    },
+    {
+      "dbId": 19,
+      "onchainGlitchId": 153,
+      "contentHash": "0x3e6c07d3b426c772bf25e05994d479e796b89eeded78615acfb1b7f0e7458d44",
+      "txHash": "0xd79bd1aa2c8748010aad94a36a79a2be20829dad86ba0792d3f360d4de587b18",
+      "videoUrl": "https://www.youtube.com/watch?v=sFIAvt_7-sU",
+      "title": "Infinite rockets with timing"
+    },
+    {
+      "dbId": 20,
+      "onchainGlitchId": 154,
+      "contentHash": "0x8ef3378ebd2b6c083edc15b58cb212245b1bdab0c6b916baf8b1a0b12cb892cd",
+      "txHash": "0xdb867506d0369aec3e43e443071227ff02f276d6fd136dec69c052af54e2aaed",
+      "videoUrl": "https://www.youtube.com/watch?v=sbQ94iGKp0g",
+      "title": "Item dupe with storage trick"
+    },
+    {
+      "dbId": 21,
+      "onchainGlitchId": 155,
+      "contentHash": "0x4580b945595d893a35ae858fea722140f39805b9eed7a44e5012f1cc989e433c",
+      "txHash": "0x60214329c7229170276004cee2731d3d74b12fff78e217379ab4de63fe5c37ee",
+      "videoUrl": "https://www.youtube.com/watch?v=5Oj2dq8jZeo",
+      "title": "Out of bounds with zip glitch"
+    },
+    {
+      "dbId": 22,
+      "onchainGlitchId": 156,
+      "contentHash": "0xcd40efc8a7fbf8fa5ffff7899a9f70dd5295a909a91f77d792c2b4b89ce4c89a",
+      "txHash": "0xa3cb6ce492e35beb642c1c9e47de25fd372d3f4dbec159c392ca8aeddbff3601",
+      "videoUrl": "https://www.youtube.com/watch?v=5GDIoshj9Rw",
+      "title": "Under map with shield clip"
+    },
+    {
+      "dbId": 23,
+      "onchainGlitchId": 157,
+      "contentHash": "0x8da37b8ec01d9a7df502fe688924cfd8835c2cf76535b399bb9b60e41904784f",
+      "txHash": "0x8eb105d9095cd78b2eee5a6a95c624fa5b98df989e6aab047d45f6c5fb981a11",
+      "videoUrl": "https://www.youtube.com/watch?v=GsGfkIkP5HA",
+      "title": "Animation cancel speed boost"
+    },
+    {
+      "dbId": 24,
+      "onchainGlitchId": 158,
+      "contentHash": "0x26caee966bf6b524b2d1b8ce2c5b054e424f97e8c9b8f3bc28c924e342d136a1",
+      "txHash": "0xcb7a1a71c4007f121e3788d20e8bd2b2a7cea29862abc24ba344c074b95fef39",
+      "videoUrl": "https://www.youtube.com/watch?v=3TgTMLhxPEY",
+      "title": "Inventory overflow to skip"
+    },
+    {
+      "dbId": 25,
+      "onchainGlitchId": 159,
+      "contentHash": "0xc79f62b7b4ded02641c67b660e1e7fe373ad3fa6bfece4fbfe550c1f43dc7dd8",
+      "txHash": "0x367b97da2bda809bc1b545d026ed225c83af9f7710bbf6c72996c6100501c1b6",
+      "videoUrl": "https://www.youtube.com/watch?v=V7Vz674gxuc",
+      "title": "Backwards long jump through the staircase (alternate route)"
+    },
+    {
+      "dbId": 26,
+      "onchainGlitchId": 160,
+      "contentHash": "0xcd1bfc1111d00e74199cb18f0a97be0b1a3fc03845c70208369ff7dacfc669ff",
+      "txHash": "0x95963e0016807b212b174a2f7212af9ea44b95d660208386debe9b759bc7fa3d",
+      "videoUrl": "https://www.youtube.com/watch?v=eE8XGov8UAc",
+      "title": "Giant Space Program launch (stable setup)"
+    },
+    {
+      "dbId": 27,
+      "onchainGlitchId": 161,
+      "contentHash": "0xd8dfb1146f80b7dc4bd9d2837034ed6fa277a7ec21e90c1bf16def29177f11d6",
+      "txHash": "0xbc7708f7d90fc466047d4d3f985065cfaed17ebd8884b4765a5b76a6baa7d35c",
+      "videoUrl": "https://www.youtube.com/watch?v=795hmJExy_w",
+      "title": "Swing Set Glitch launch (modern patch)"
+    },
+    {
+      "dbId": 28,
+      "onchainGlitchId": 162,
+      "contentHash": "0x119a3edf3405fc91e7f30490c731481042ddc574f51c78b6afb2d1b9a10169f1",
+      "txHash": "0xd6bb1031d05d1d5af8f5119ab13c6bc41354bd1029533f01bd589c4c4cbe64bf",
+      "videoUrl": "https://www.youtube.com/watch?v=HQOemSUsFy4",
+      "title": "MissingNo. item duplication (alternate route)"
+    },
+    {
+      "dbId": 29,
+      "onchainGlitchId": 163,
+      "contentHash": "0x6f78dd8da9793eb53b56a79794f2175a847121f802f172c00fdf685858aef124",
+      "txHash": "0x039a1cbb2600ded22f8307794ba9569e4add74f617d47acffb7a602bb16e656c",
+      "videoUrl": "https://www.youtube.com/watch?v=S3XIkYGMZ_k",
+      "title": "Moon jump (stable setup)"
+    },
+    {
+      "dbId": 30,
+      "onchainGlitchId": 164,
+      "contentHash": "0x365c39b9ac1b64716770d20dc0cf49888100a26e04f216547a4edb2dea45c489",
+      "txHash": "0x1372e696a515cc4cdf974c6fe7288fe38f79773a256fa1ad037e378d2e54c734",
+      "videoUrl": "https://www.youtube.com/watch?v=JL1SoxtgDrc",
+      "title": "Item duplication early in the game (modern patch)"
+    },
+    {
+      "dbId": 31,
+      "onchainGlitchId": 165,
+      "contentHash": "0x8ec986496840d135d39f04e3aac10098261454b371dac2e2b65328a11bd3db80",
+      "txHash": "0x6768c88d2535b9d93cca2cd2638530be84ee8677cd551de586e00013b8b7a437",
+      "videoUrl": "https://www.youtube.com/watch?v=wy8RFjeV6pM",
+      "title": "Far Lands terrain collapse (alternate route)"
+    },
+    {
+      "dbId": 32,
+      "onchainGlitchId": 166,
+      "contentHash": "0xb988dd9ecd33f0b4113f5599267d9cbab730ef70ce629f0481faeb6cc6ce97e3",
+      "txHash": "0x350cfdf65c0790b5fc89c36ac5e3577ff5bd5b3e254631b6295c321a5df87a1c",
+      "videoUrl": "https://www.youtube.com/watch?v=8rf9bYaRa1s",
+      "title": "Super bounce out of bounds (stable setup)"
+    },
+    {
+      "dbId": 33,
+      "onchainGlitchId": 167,
+      "contentHash": "0x58cd83ada98fd7fc30155e5890c2782e4d8acb09fb7abc677ab34114c91e0889",
+      "txHash": "0x30598d30e38e0a073da37ea52825185bc342f6369e755f50eaca488021dea399",
+      "videoUrl": "https://www.youtube.com/watch?v=T9vdHGLfIs8",
+      "title": "Wrong warp (modern patch)"
+    },
+    {
+      "dbId": 34,
+      "onchainGlitchId": 168,
+      "contentHash": "0x49af17c993a4bf61f59859c4fbc6aef4615a1b6af8caee81ae0ee87fa8162e7b",
+      "txHash": "0x166e064a6d35e2e4299aa9ae1144613943ac93186288e02620274b56b994b042",
+      "videoUrl": "https://www.youtube.com/watch?v=AWcDT9BQ1OQ",
+      "title": "Pomeg berry corruption (alternate route)"
+    },
+    {
+      "dbId": 35,
+      "onchainGlitchId": 169,
+      "contentHash": "0x2f3fb05080bc4be92713e06ca6e40229cbf929e98dec9a1bc0eb11b674fea2d7",
+      "txHash": "0x2edb5138a301c27f46bd4f95bc5d15f53717c32efe9c4ea706347fd5cc0c4986",
+      "videoUrl": "https://www.youtube.com/watch?v=XztDN3ej3sU",
+      "title": "Out of bounds clip (stable setup)"
+    },
+    {
+      "dbId": 36,
+      "onchainGlitchId": 170,
+      "contentHash": "0xe04e01345fc2bb730ad2772d6a49bc1f89bdee7831bc4aef8aac24a4f4e0183f",
+      "txHash": "0x53db7a52d9cce0689ad03e55e326d5930062b2a466136141cb30692fa880932f",
+      "videoUrl": "https://www.youtube.com/watch?v=TfDO1ww4zGU",
+      "title": "Infinite jump (modern patch)"
+    },
+    {
+      "dbId": 37,
+      "onchainGlitchId": 171,
+      "contentHash": "0x16e80b777de38f72779d66b2406b51d6b994c07269b8b1c07936fedb4f2bc584",
+      "txHash": "0xd6918979008195393732ea5afa691db9159311f6d1c3c693c0dd267a1aa3cd5f",
+      "videoUrl": "https://www.youtube.com/watch?v=PtIFoUK0bCY",
+      "title": "Clip through geometry (alternate route)"
+    },
+    {
+      "dbId": 38,
+      "onchainGlitchId": 172,
+      "contentHash": "0x3a0a17c2ef2996493331f2e7e4dc150b2b8f02ef0a9a157223f52f8b8db06ed9",
+      "txHash": "0x0085693057633d3158a11d44384ba87d92ede4a9a057d93e5028cde8e6ff6dfa",
+      "videoUrl": "https://www.youtube.com/watch?v=q2PQCTh0fv8",
+      "title": "Physics launch chain (stable setup)"
+    },
+    {
+      "dbId": 39,
+      "onchainGlitchId": 173,
+      "contentHash": "0xdcebeaaeda61214ffdaa0358194081f608e1d6b4a37893bc4ad9af9ba14b1743",
+      "txHash": "0x975c0bdb02eb16bdc4b8cf9154082dececf45dcabd660909ae15c875e8790343",
+      "videoUrl": "https://www.youtube.com/watch?v=I9iuuRuuIEk",
+      "title": "Horse launch glitch (modern patch)"
+    },
+    {
+      "dbId": 40,
+      "onchainGlitchId": 174,
+      "contentHash": "0x97df27b28300dbe3e07c92162fbc1969447c94e0cd85bbe44e22182a0ae5f90b",
+      "txHash": "0xd4d5957cb121b6872df96980e99dbe4d93e661e832b795c8488b380c5884c068",
+      "videoUrl": "https://www.youtube.com/watch?v=mbthdP2SkNA",
+      "title": "Memory storage setup (alternate route)"
+    },
+    {
+      "dbId": 41,
+      "onchainGlitchId": 175,
+      "contentHash": "0x2a2e89d7bcd2ce4389c832529aacfda770a051f4949971065b87bac3c3705da7",
+      "txHash": "0x97c7f673c307f55f52231315e3095e6876d95a2c25265fb8ccce7ab7eb1126ea",
+      "videoUrl": "https://www.youtube.com/watch?v=KByZc-yKIRE",
+      "title": "Revolver Ocelot knockback launch (stable setup)"
+    },
+    {
+      "dbId": 42,
+      "onchainGlitchId": 176,
+      "contentHash": "0x21beab59a573f191ade3d6204021d139e1c0fc54f8938789e73dd53319c0ad7a",
+      "txHash": "0x1a5a8da52b1159c29ba58af5f00a358eac2254168b257f61c85282942eb424ed",
+      "videoUrl": "https://www.youtube.com/watch?v=hTYreJX_578",
+      "title": "Rocket jump to unintended spots (modern patch)"
+    },
+    {
+      "dbId": 43,
+      "onchainGlitchId": 177,
+      "contentHash": "0xb9bb9da2af0da54f732ad4bf010c743f30ab3fa5247c4149a60b4d115c8c884f",
+      "txHash": "0x8e08ad876c38976541b0329b840d9c86cd444c0e77c908effd2cab268c538ecd",
+      "videoUrl": "https://www.youtube.com/watch?v=LFjHBKxkIxA",
+      "title": "Infinite rockets with timing (alternate route)"
+    },
+    {
+      "dbId": 44,
+      "onchainGlitchId": 178,
+      "contentHash": "0x9165ea919b20a05d34bd358f95ffc2d4c4a6538cd95b92e05dfed4843cde1b4d",
+      "txHash": "0x7439d905eb953698718f1e01977f297134e16786832ce42ac78eff8652d5191e",
+      "videoUrl": "https://www.youtube.com/watch?v=6zFglcGs0qw",
+      "title": "Item dupe with storage trick (stable setup)"
+    },
+    {
+      "dbId": 45,
+      "onchainGlitchId": 179,
+      "contentHash": "0x06e745695af5b77f71dddaab24fe8b54b345de2e7920afdf0661b713a1fc032a",
+      "txHash": "0x4c55e649588e9b9048f95782a26f1bc960c5fddb896a69668175873f094946e3",
+      "videoUrl": "https://www.youtube.com/watch?v=2JSbo39kebk",
+      "title": "Out of bounds with zip glitch (modern patch)"
+    },
+    {
+      "dbId": 46,
+      "onchainGlitchId": 180,
+      "contentHash": "0x60b67b5d48c5d7f2162aeca876af15318dfe4d877cff8bfd3d9deeec4b3eb838",
+      "txHash": "0x013cbbd6871cf6f9fe8a45b24cfac9d06e597ce0b44ca606556c191e61e5daa3",
+      "videoUrl": "https://www.youtube.com/watch?v=8lOTGYRzAkA",
+      "title": "Under map with shield clip (alternate route)"
+    },
+    {
+      "dbId": 47,
+      "onchainGlitchId": 181,
+      "contentHash": "0x56dc4e4f1743f71551d05f618eb3a71008c37b938b878f36472a6dff12469daf",
+      "txHash": "0x98133fa2c9ad97ae2f7b802b435d00effe17b14f8de6e1070682cf164400b2de",
+      "videoUrl": "https://www.youtube.com/watch?v=VUb4UK3aFas",
+      "title": "Animation cancel speed boost (stable setup)"
+    },
+    {
+      "dbId": 48,
+      "onchainGlitchId": 182,
+      "contentHash": "0x39eeca0a0c1bd5d43c29cbd015e5ca50c063d01d2d91bfc8a28266d511407a02",
+      "txHash": "0xfa491e36a4f7539daf0e7ce867981ebec0a12bb76921d04f0b5ac4d7fea79cb7",
+      "videoUrl": "https://www.youtube.com/watch?v=kFxeYNSxPd8",
+      "title": "Inventory overflow to skip (modern patch)"
+    },
+    {
+      "dbId": 49,
+      "onchainGlitchId": 183,
+      "contentHash": "0x9f05395bbff6f75b77946d064d1df6742f8a507eed691bc3a161a9c1c50adab3",
+      "txHash": "0x7644e13f7335645401f3c98285b94a5e35c6e082764c8c792f0d17539fe26611",
+      "videoUrl": "https://www.youtube.com/watch?v=4WwteobQL78",
+      "title": "Backwards long jump through the staircase (alternate route)"
+    },
+    {
+      "dbId": 50,
+      "onchainGlitchId": 184,
+      "contentHash": "0xe02ca384914b12e0de6008164c07c93319a04e1a4b08165112f393595687e733",
+      "txHash": "0xda78f6c6679dc5874c5ca49d7a240f745d8eebe008d0955c9480724e429cf290",
+      "videoUrl": "https://www.youtube.com/watch?v=v7GIf4WEemA",
+      "title": "Giant Space Program launch (stable setup)"
+    }
+  ]
+}

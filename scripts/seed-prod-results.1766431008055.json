@@ -1,0 +1,247 @@
+{
+  "createdAt": "2025-12-22T19:16:48.059Z",
+  "seedTargetUrl": "https://base-glitch-hunter-library.vercel.app",
+  "registryAddress": "0xd3D49560C90A65Afd0819B7fa3b8B50542e02789",
+  "results": [
+    {
+      "dbId": 104,
+      "onchainGlitchId": 105,
+      "contentHash": "0x1e27f482b864cf99650c6e09bae7677074df96ba17254d93f291a1de9dd51c9c",
+      "txHash": "0xa7c1b3a9302ab236a7542db4cf4de11851010c3c3b90bfd6fe3bb51bd3807bd4",
+      "videoUrl": "https://www.youtube.com/watch?v=RKgz1M0O6QQ",
+      "title": "Duplicate items via mailbox timing"
+    },
+    {
+      "dbId": 105,
+      "onchainGlitchId": 106,
+      "contentHash": "0x80017cc8e3dad655b286790f89dd74cb065c01a9efea5d4606d74f84dd50c1cc",
+      "txHash": "0x6b0694c18ced6d5b982285a6bc2d89e186dda96b51fa00eff313499ad6cb8a8c",
+      "videoUrl": "https://www.youtube.com/watch?v=9kQPnFXQBmw",
+      "title": "Out of bounds clip near town edges"
+    },
+    {
+      "dbId": 106,
+      "onchainGlitchId": 107,
+      "contentHash": "0x07c9868eb761338919df83ee31062ab585028d372a338e3bc748cc4bcfb6ccec",
+      "txHash": "0xa3bb5d64249cb9dfceb8f938240cc248d5336f14a064430c93391da4dccffd39",
+      "videoUrl": "https://www.youtube.com/watch?v=5JPMeD2YQp8",
+      "title": "Item dupe with online trade timing"
+    },
+    {
+      "dbId": 107,
+      "onchainGlitchId": 108,
+      "contentHash": "0x3eb734417676ca4e7a674148a1ed9ab4e3cac98b063018b833d0697c76c7a155",
+      "txHash": "0x5a6a25c1d2e474d22fc54197bf124419bf45241b78e4d746db5e51fda1e3b7c7",
+      "videoUrl": "https://www.youtube.com/watch?v=SPNsL6LV56s",
+      "title": "Bridge placement clip"
+    },
+    {
+      "dbId": 108,
+      "onchainGlitchId": 109,
+      "contentHash": "0x6746964c5c7046bf43a8728a82b91a513f852f257abc08531da9c7df264202ad",
+      "txHash": "0x9175aa6c101d363498d58971530885b728ad8b89fcc36b95ee50ca915fddfc4d",
+      "videoUrl": "https://www.youtube.com/watch?v=0V4pcvGOPrY",
+      "title": "Menu storage to duplicate items"
+    },
+    {
+      "dbId": 109,
+      "onchainGlitchId": 110,
+      "contentHash": "0x8a536fc53856a55e2dc652aee4eb42a2b74c0f3edaed332df4efef280d65af66",
+      "txHash": "0x961aca1336c86c6e4a5adf42ef266c72b80915d272bb2546c60e7486dba1cfde",
+      "videoUrl": "https://www.youtube.com/watch?v=-XqggqeMZsQ",
+      "title": "Out of bounds island clip"
+    },
+    {
+      "dbId": 110,
+      "onchainGlitchId": 111,
+      "contentHash": "0x3e12c58084b5fbeeab2f25d72079ffc166e3e50dd25a77e2f44f1e7881c5cedf",
+      "txHash": "0xb0d2e5dd53142dc75e69e99f35c391fc58ff8ea1a28777692e7b8d3e7657168d",
+      "videoUrl": "https://www.youtube.com/watch?v=LltZVSQwyao",
+      "title": "Turnip dupe timing"
+    },
+    {
+      "dbId": 111,
+      "onchainGlitchId": 112,
+      "contentHash": "0x462ce4303283fad8a5b9709bd491b921cac1a42520d86549c6187be20f5d84da",
+      "txHash": "0x625c323a9daeb4b9ed35fe7534a81f7d6958e4667f09aa5d09c48209c2ab7bd3",
+      "videoUrl": "https://www.youtube.com/watch?v=pkdyFPgBzZQ",
+      "title": "Swimming out of bounds"
+    },
+    {
+      "dbId": 112,
+      "onchainGlitchId": 113,
+      "contentHash": "0xef78993df5983139ee8e54ee7796e17d4ddc7e02cab5936e16635a34986bf341",
+      "txHash": "0xb98f83b2c41349d98239b3281b26d2df99db8bd326009748e28a3ee126a9069a",
+      "videoUrl": "https://www.youtube.com/watch?v=PpDYsD9e3CA",
+      "title": "Terrain clipping with ladder"
+    },
+    {
+      "dbId": 113,
+      "onchainGlitchId": 114,
+      "contentHash": "0x7e34a48c1c0ab9848e83a95e0f4dc2ccbf8f9aebfb0436a83d31da7218ab15d0",
+      "txHash": "0x51f5507b9cf19b93d206e697c42ca53167e988e792d82b41ffe97b694be4f090",
+      "videoUrl": "https://www.youtube.com/watch?v=alnScYaBbsI",
+      "title": "Design placement overlap"
+    },
+    {
+      "dbId": 114,
+      "onchainGlitchId": 115,
+      "contentHash": "0x508a43e26e202c01070d759f95d129ad7154633b402379592d933432c7093db3",
+      "txHash": "0xe4a905c3fdb911cf819f2dc2e6ec25bfb354bdfc338dce10cd6c92e46d7c33f7",
+      "videoUrl": "https://www.youtube.com/watch?v=LANGxecQYTI",
+      "title": "Inventory desync in camps"
+    },
+    {
+      "dbId": 115,
+      "onchainGlitchId": 116,
+      "contentHash": "0x38e974160294e4d940d6adee4ab759304236f042d663a7e2ad071f3551b4268f",
+      "txHash": "0x7494bebbeedc165806302ef35943f18b86a2a1444e03eada1aa4484cc50e1bcc",
+      "videoUrl": "https://www.youtube.com/watch?v=zjO_awYB35U",
+      "title": "Amiibo Festival board softlock"
+    },
+    {
+      "dbId": 116,
+      "onchainGlitchId": 117,
+      "contentHash": "0xdbc4a6a13d4fcb0b8694dc7694cfbc59e4b4a719384c8cac69a52d0d5de040d3",
+      "txHash": "0xc8726a1a3877f2ea12223387a1c3f2db7ed017dcc852b1297dd5f4b378a8115d",
+      "videoUrl": "https://www.youtube.com/watch?v=sRvs14tXrVA",
+      "title": "Duplicate items via mailbox timing (alternate setup)"
+    },
+    {
+      "dbId": 117,
+      "onchainGlitchId": 118,
+      "contentHash": "0xfb86d3411bf8e7cd06c38ade149e4e7a8623f7588d8494bbbdd6c4951f3e96ef",
+      "txHash": "0x5cfa54099b18a6a3b6ec15a08a2c72fef24696f73ef200daef6eddf03f605d2e",
+      "videoUrl": "https://www.youtube.com/watch?v=sgp4IjX0wxI",
+      "title": "Out of bounds clip near town edges (stable timing)"
+    },
+    {
+      "dbId": 118,
+      "onchainGlitchId": 119,
+      "contentHash": "0x0f0180589e64e28bef862ee0ce73a5be433412f54fe961bff20217cab3a7318b",
+      "txHash": "0x53b85442d8342b2ca94d0bafd73bbb67fdf69932ec018b38359b3920e6ad13da",
+      "videoUrl": "https://www.youtube.com/watch?v=PYFOswwB1-g",
+      "title": "Item dupe with online trade timing (modern patch)"
+    },
+    {
+      "dbId": 119,
+      "onchainGlitchId": 120,
+      "contentHash": "0x54f68e5f06d587d7148d9eeb72155cd7054c725366b041234f174f9fad4c50fc",
+      "txHash": "0x0f4d7b6ce51db45860c7a14071e44c53996326a3dfc68e3ac45945dccb91dd09",
+      "videoUrl": "https://www.youtube.com/watch?v=zArbPbi9AeE",
+      "title": "Bridge placement clip (alternate setup)"
+    },
+    {
+      "dbId": 120,
+      "onchainGlitchId": 121,
+      "contentHash": "0xe219380015ada6fe5cf8d7698dc31c03512f214a761cd549654bbcaefb7c151c",
+      "txHash": "0x67bbb5d1dd0e660e8523166e86703a990c0058644bd29db32a3c6cf55ccf84c1",
+      "videoUrl": "https://www.youtube.com/watch?v=RguQqOjh_ZQ",
+      "title": "Menu storage to duplicate items (stable timing)"
+    },
+    {
+      "dbId": 121,
+      "onchainGlitchId": 122,
+      "contentHash": "0x7f53601da3ca3834e456b6e1c635eda2c625eb014b5fc7893ae5e2eb2aa92da9",
+      "txHash": "0xa6fa7c150e7c5b773a27ae0e872686065a89125725048489b74570c6662d8720",
+      "videoUrl": "https://www.youtube.com/watch?v=sxxIW1DxckQ",
+      "title": "Out of bounds island clip (modern patch)"
+    },
+    {
+      "dbId": 122,
+      "onchainGlitchId": 123,
+      "contentHash": "0xad59ed09fecc6b49c743a3313e3b6edfa56519be64923acb76e28eeb4c666b99",
+      "txHash": "0x255881d23fac26cd5cd022388df393c73a3f12d453628f9f877ac6f9154f1716",
+      "videoUrl": "https://www.youtube.com/watch?v=9HGbn5VfoaQ",
+      "title": "Turnip dupe timing (alternate setup)"
+    },
+    {
+      "dbId": 123,
+      "onchainGlitchId": 124,
+      "contentHash": "0x1ace0197c402d9f60b468e4ef1f41de90086b6601ed96bc88d70d3a0b450de5f",
+      "txHash": "0xc5d14025f37d164d711018bd7ea439cd209995c93bec42df01b0d06855712fed",
+      "videoUrl": "https://www.youtube.com/watch?v=gf02XLF2Ebg",
+      "title": "Swimming out of bounds (stable timing)"
+    },
+    {
+      "dbId": 124,
+      "onchainGlitchId": 125,
+      "contentHash": "0x9de31690c13abca3118b1d1abe9ec44e40c6b5abf86830e2c5e540140841ede4",
+      "txHash": "0x3c2a3519b19feb5dc4e91c5ad25be12087a1dbfda4ae731910707439a7b75191",
+      "videoUrl": "https://www.youtube.com/watch?v=XJ0bbx2eD4E",
+      "title": "Terrain clipping with ladder (modern patch)"
+    },
+    {
+      "dbId": 125,
+      "onchainGlitchId": 126,
+      "contentHash": "0x8428c2e950739f1b396b385c244f15e1666a67e1cc558ece8ee508b5bf8cde18",
+      "txHash": "0x2d9df9f244a00b77a46f1520a68f5b2e86092a93dde911c2d51e7e712712e8f4",
+      "videoUrl": "https://www.youtube.com/watch?v=PlD9vtYB1nE",
+      "title": "Design placement overlap (alternate setup)"
+    },
+    {
+      "dbId": 126,
+      "onchainGlitchId": 127,
+      "contentHash": "0xce61ca5d79d456bf80fef13c45d42312aab538fc0637b5c897daff97402b9170",
+      "txHash": "0xc1262aead3e8e6a7616c91aa9a899ca66e8b7f53fe75fff4bc6bee680a6f633f",
+      "videoUrl": "https://www.youtube.com/watch?v=lPpF09qmD0U",
+      "title": "Inventory desync in camps (stable timing)"
+    },
+    {
+      "dbId": 127,
+      "onchainGlitchId": 128,
+      "contentHash": "0xe3743e8066284a80358afb44e83f6d7fc7ed475d38f43df110ec088800f2e355",
+      "txHash": "0x00e0e1219f975bf370802c0df5d2aecb625e99f15e52be183cca6232af308ae5",
+      "videoUrl": "https://www.youtube.com/watch?v=W-Ot8E6aIUM",
+      "title": "Amiibo Festival board softlock (modern patch)"
+    },
+    {
+      "dbId": 128,
+      "onchainGlitchId": 129,
+      "contentHash": "0xcd7f3f920950b2b92eab4072b84bd6522c7fc47d67dc8cc6119b1726b5ffc2ac",
+      "txHash": "0x8d513ed4c23c43a131c567d7796f0d152b69e6878e9bad64c0bb2b8cc25b024c",
+      "videoUrl": "https://www.youtube.com/watch?v=Zj8ZdpIXwtA",
+      "title": "Duplicate items via mailbox timing (alternate setup)"
+    },
+    {
+      "dbId": 129,
+      "onchainGlitchId": 130,
+      "contentHash": "0x77c411db88bbc94c1cfe26e1255e8ec7247348cf4f3b1ea2336f75bc40347f8e",
+      "txHash": "0x433cf6ec72ba5c1aaf2f4bbf63b9682ecd1dda4da55c418f058edbf2d2a44099",
+      "videoUrl": "https://www.youtube.com/watch?v=aU-Bbyk-Gto",
+      "title": "Out of bounds clip near town edges (stable timing)"
+    },
+    {
+      "dbId": 130,
+      "onchainGlitchId": 131,
+      "contentHash": "0x9dd41e181fba40a56f4af5ee82cb3e0d42e9ba08d64321d972aef4ee86fed864",
+      "txHash": "0xae4981856013a84cee8970e7b5a5934ce443c1c5debb6f8da8f6cc36a811a03d",
+      "videoUrl": "https://www.youtube.com/watch?v=-bfMcmBWfmg",
+      "title": "Item dupe with online trade timing (modern patch)"
+    },
+    {
+      "dbId": 131,
+      "onchainGlitchId": 132,
+      "contentHash": "0x21329ab449857b8d2105fb774c4e544294c36596d12322bfcc8b5129a60f36a3",
+      "txHash": "0x7edd132168f42892428210bcf2b1ffeddc2160a0591ef32cf282ccccc4b23038",
+      "videoUrl": "https://www.youtube.com/watch?v=FKoNP9DFd-o",
+      "title": "Bridge placement clip (alternate setup)"
+    },
+    {
+      "dbId": 132,
+      "onchainGlitchId": 133,
+      "contentHash": "0x8d106fd191151dc1f052744f3b0cbd04cbee71354e0596b25e54e07dbbc6a23e",
+      "txHash": "0x309231578c80b6381bcb322f2a1489d2dcc31b300533885b92704a5472ed10d0",
+      "videoUrl": "https://www.youtube.com/watch?v=tRoudNVPrMc",
+      "title": "Menu storage to duplicate items (stable timing)"
+    },
+    {
+      "dbId": 133,
+      "onchainGlitchId": 134,
+      "contentHash": "0x7ef65b22df96f339c8eb5459100a691aa7ae7ee363acc069c8bb967ac1925816",
+      "txHash": "0x65e819e6f993b7c08205b5277df5fcfdbb4af83d9e15208d4ab9ce2b7e279f2b",
+      "videoUrl": "https://www.youtube.com/watch?v=qiT3PIhsmZQ",
+      "title": "Out of bounds island clip (modern patch)"
+    }
+  ]
+}

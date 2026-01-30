@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { useMiniKit } from '@coinbase/onchainkit/minikit';
 
@@ -10,53 +9,19 @@ interface HeaderProps {
   actionHref?: string;
 }
 
-export default function Header({ actionText, actionHref }: HeaderProps) {
+export default function Header({ actionText = 'Submit', actionHref = '/submit' }: HeaderProps) {
   const { address, isConnected } = useAccount();
   const { connect, connectors, isPending } = useConnect();
   const { disconnect } = useDisconnect();
   const { context } = useMiniKit();
-  const searchParams = useSearchParams();
-  const langParam = searchParams.get('lang');
-  const envLang = (process.env.NEXT_PUBLIC_LANG || '').toLowerCase();
-  const fallbackLang = envLang === 'en' || envLang === 'ja' ? envLang : '';
-  const lang = (langParam === 'en' || langParam === 'ja' ? langParam : fallbackLang) || 'ja';
-  const isEnglish = lang === 'en';
-  const shouldIncludeLang = Boolean(langParam || fallbackLang);
 
-  const withLang = (href: string) => {
-    if (!shouldIncludeLang) return href;
-    if (!href.startsWith('/') || href.includes('lang=')) return href;
-    const [path, query] = href.split('?');
-    const params = new URLSearchParams(query || '');
-    params.set('lang', lang);
-    return `${path}?${params.toString()}`;
-  };
-
-  const homeHref = withLang('/');
-  const resolvedActionHref = withLang(actionHref || '/submit');
-  const resolvedActionText = actionText || (isEnglish ? 'Submit' : '投稿する');
+  const displayAddress = address;
   const avatarUrl = context?.user?.pfpUrl ?? '';
-  const avatarLabel =
-    context?.user?.displayName ||
-    context?.user?.username ||
-    'Profile avatar';
+  const avatarLabel = context?.user?.displayName || context?.user?.username || 'Profile avatar';
   const showAvatar = isConnected && avatarUrl.length > 0;
   const isMiniApp = Boolean(context);
   const shouldDisableWalletAction = isMiniApp && isConnected;
-  const hasInjectedProvider =
-    typeof window !== 'undefined' && Boolean((window as Window & { ethereum?: unknown }).ethereum);
-
-  const labels = isEnglish
-    ? {
-        connecting: 'Connecting...',
-        connect: 'Connect wallet',
-        disconnectTitle: 'Click to disconnect',
-      }
-    : {
-        connecting: '接続中...',
-        connect: 'ウォレット接続',
-        disconnectTitle: 'クリックで切断',
-      };
+  const hasInjectedProvider = typeof window !== 'undefined' && Boolean((window as Window & { ethereum?: unknown }).ethereum);
 
   const handleConnect = () => {
     const baseAccountConnector = connectors.find((c) => c.id === 'baseAccount');
@@ -79,17 +44,21 @@ export default function Header({ actionText, actionHref }: HeaderProps) {
     }
   };
 
+  const handleDisconnect = () => {
+    disconnect();
+  };
+
   return (
     <header className="page-header">
       <h1 className="page-header__title">
-        <Link href={homeHref}>Glitch Hunter Library</Link>
+        <Link href="/">GLITCH_HUNTER_LIB</Link>
       </h1>
       <div className="page-header__actions">
         {isConnected ? (
           <button
             className={`wallet-button wallet-button--connected${showAvatar ? ' wallet-button--avatar' : ''}`}
-            onClick={shouldDisableWalletAction ? undefined : () => disconnect()}
-            title={shouldDisableWalletAction ? undefined : labels.disconnectTitle}
+            onClick={shouldDisableWalletAction ? undefined : handleDisconnect}
+            title={shouldDisableWalletAction ? undefined : 'Click to disconnect'}
             disabled={shouldDisableWalletAction}
             aria-disabled={shouldDisableWalletAction}
           >
@@ -99,10 +68,12 @@ export default function Header({ actionText, actionHref }: HeaderProps) {
                 alt={avatarLabel}
                 className="wallet-button__avatar"
               />
-            ) : (
+            ) : displayAddress ? (
               <>
-                {address?.slice(0, 6)}...{address?.slice(-4)}
+                {displayAddress.slice(0, 6)}...{displayAddress.slice(-4)}
               </>
+            ) : (
+              <>Connecting...</>
             )}
           </button>
         ) : (
@@ -111,11 +82,11 @@ export default function Header({ actionText, actionHref }: HeaderProps) {
             onClick={handleConnect}
             disabled={isPending}
           >
-            {isPending ? labels.connecting : labels.connect}
+            {isPending ? 'Connecting...' : '[CONNECT]'}
           </button>
         )}
-        <Link href={resolvedActionHref} className="page-header__action">
-          {resolvedActionText}
+        <Link href={actionHref} className="page-header__action">
+          {actionText}
         </Link>
       </div>
     </header>

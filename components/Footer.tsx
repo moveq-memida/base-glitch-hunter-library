@@ -1,37 +1,39 @@
 'use client';
 
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 
 export default function Footer() {
-  const searchParams = useSearchParams();
-  const langParam = searchParams.get('lang');
-  const envLang = (process.env.NEXT_PUBLIC_LANG || '').toLowerCase();
-  const fallbackLang = envLang === 'en' || envLang === 'ja' ? envLang : '';
-  const lang = (langParam === 'en' || langParam === 'ja' ? langParam : fallbackLang) || 'ja';
-  const isEnglish = lang === 'en';
-  const shouldIncludeLang = Boolean(langParam || fallbackLang);
-  const termsHref = shouldIncludeLang ? `/terms?lang=${lang}` : '/terms';
-
-  const copy = isEnglish
-    ? {
-        description: '© 2025 Glitch Hunter Library — Glitch archive (Base Mini App)',
-        terms: 'Terms',
-      }
-    : {
-        description: '© 2025 Glitch Hunter Library — バグの博物館（Base Mini App）',
-        terms: '利用規約',
-      };
+  const navItems = [
+    { label: 'GAMES', href: '/games' },
+    { label: 'RANKINGS', href: '/leaderboard' },
+    { label: 'CONTESTS', href: '/contests' },
+    { label: 'STATS', href: '/analytics' },
+    { label: 'SUBMIT', href: '/submit' },
+  ];
 
   return (
     <footer className="page-footer">
-      <p>{copy.description}</p>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem' }}>
-        <a href="https://github.com/moveq-memida/base-glitch-hunter-library" target="_blank" rel="noopener noreferrer">
-          GitHub
+      <nav className="page-footer__nav">
+        {navItems.map((item) => (
+          <Link key={item.label} href={item.href}>[{item.label}]</Link>
+        ))}
+      </nav>
+
+      <p style={{ color: 'var(--accent-green)', marginBottom: '0.75rem' }}>
+        {'>'} SYSTEM STATUS: ONLINE
+      </p>
+
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
+        <a href="https://github.com/anthropics/claude-code" target="_blank" rel="noopener noreferrer">
+          [GITHUB]
         </a>
-        <Link href={termsHref}>{copy.terms}</Link>
+        <a href="https://basescan.org" target="_blank" rel="noopener noreferrer">
+          [BASESCAN]
+        </a>
+        <Link href="/terms">[TERMS]</Link>
       </div>
+
+      <p>(C) 2025 GLITCH_HUNTER_LIB</p>
     </footer>
   );
 }

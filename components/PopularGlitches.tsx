@@ -1,9 +1,8 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import { createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
-import { useSearchParams } from 'next/navigation';
 import GlitchCard from './GlitchCard';
 import { glitchRegistryABI, GLITCH_REGISTRY_ADDRESS } from '@/lib/contracts';
 
@@ -38,32 +37,10 @@ interface PopularGlitchesProps {
 }
 
 export default function PopularGlitches({ glitches }: PopularGlitchesProps) {
-  const searchParams = useSearchParams();
-  const langParam = searchParams.get('lang');
-  const envLang = (process.env.NEXT_PUBLIC_LANG || '').toLowerCase();
-  const fallbackLang = envLang === 'en' || envLang === 'ja' ? envLang : '';
-  const lang = (langParam === 'en' || langParam === 'ja' ? langParam : fallbackLang) || 'ja';
-  const isEnglish = lang === 'en';
   const [sortedGlitches, setSortedGlitches] = useState<(Glitch & { voteCount: number })[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
-
-  const labels = isEnglish
-    ? {
-        title: 'Popular glitches',
-        loading: 'Loading popular glitches',
-        votes: 'votes',
-        error: 'Failed to load popular glitches.',
-        retry: 'Retry',
-      }
-    : {
-        title: '人気のバグ',
-        loading: '人気のバグを読み込み中',
-        votes: '票',
-        error: '人気ランキングの取得に失敗しました。',
-        retry: '再読み込み',
-      };
 
   useEffect(() => {
     async function fetchVoteCounts() {
@@ -135,8 +112,8 @@ export default function PopularGlitches({ glitches }: PopularGlitchesProps) {
   if (isLoading) {
     return (
       <section className="popular-section">
-        <h3 className="popular-section__title">{labels.title}</h3>
-        <div className="popular-section__list popular-section__list--skeleton" aria-label={labels.loading}>
+        <h3 className="popular-section__title">Trending Now</h3>
+        <div className="popular-section__list popular-section__list--skeleton" aria-label="Loading trending glitches">
           {Array.from({ length: 3 }).map((_, index) => (
             <div key={index} className="popular-section__item">
               <div className="skeleton skeleton-line skeleton-line--short" />
@@ -157,12 +134,12 @@ export default function PopularGlitches({ glitches }: PopularGlitchesProps) {
   if (hasError) {
     return (
       <section className="popular-section">
-        <h3 className="popular-section__title">{labels.title}</h3>
+        <h3 className="popular-section__title">Trending Now</h3>
         <div className="empty-state">
-          <p className="empty-state__copy">{labels.error}</p>
+          <p className="empty-state__copy">Failed to load trending glitches.</p>
           <div className="empty-state__actions">
             <button type="button" className="button-secondary" onClick={handleRetry}>
-              {labels.retry}
+              Retry
             </button>
           </div>
         </div>
@@ -176,7 +153,7 @@ export default function PopularGlitches({ glitches }: PopularGlitchesProps) {
 
   return (
     <section className="popular-section">
-      <h3 className="popular-section__title">{labels.title}</h3>
+      <h3 className="popular-section__title">Trending Now</h3>
       <div className="popular-section__list">
         {sortedGlitches.map((glitch, index) => (
           <div key={glitch.id} className="popular-section__item">

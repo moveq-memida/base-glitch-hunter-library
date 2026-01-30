@@ -57,8 +57,9 @@ cp .env.example .env
 Required environment variables:
 
 ```env
-# Database (use Prisma's local dev DB or your own PostgreSQL)
+# Database (PostgreSQL; Neon recommended)
 DATABASE_URL="your_postgres_connection_string"
+DIRECT_URL="your_direct_postgres_connection_string"
 
 # Base Network RPC URLs (defaults provided)
 BASE_MAINNET_RPC_URL="https://mainnet.base.org"
@@ -76,6 +77,9 @@ BASESCAN_API_KEY="your_basescan_api_key"
 NEXT_PUBLIC_GLITCH_REGISTRY_ADDRESS="deployed_contract_address"
 ```
 
+If you use Neon, set `DATABASE_URL` to the pooled connection string and `DIRECT_URL`
+to the direct connection string for Prisma migrations.
+
 ### 3. Database Setup
 
 If using Prisma's local development database:
@@ -84,7 +88,7 @@ If using Prisma's local development database:
 npx prisma dev
 ```
 
-Or configure your own PostgreSQL database and run:
+Or configure your own PostgreSQL database (e.g. Neon) and run:
 
 ```bash
 npx prisma generate

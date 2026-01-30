@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
 
 export interface GlitchCardData {
   id: string | number;
@@ -14,6 +13,10 @@ export interface GlitchCardData {
   video_url?: string | null;
   voteCount?: number;
   stamp_tx_hash?: string | null;
+  author_address?: string;
+  created_at?: string | Date;
+  speedrun_category?: string | null;
+  difficulty?: number | null;
 }
 
 interface GlitchCardProps {
@@ -24,7 +27,6 @@ interface GlitchCardProps {
 function getYouTubeThumbnail(url: string | null | undefined): string | null {
   if (!url) return null;
 
-  // YouTube patterns: youtube.com/watch?v=ID, youtu.be/ID, youtube.com/embed/ID
   const patterns = [
     /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
   ];
@@ -40,14 +42,6 @@ function getYouTubeThumbnail(url: string | null | undefined): string | null {
 }
 
 export default function GlitchCard({ glitch, compact = false }: GlitchCardProps) {
-  const searchParams = useSearchParams();
-  const langParam = searchParams.get('lang');
-  const envLang = (process.env.NEXT_PUBLIC_LANG || '').toLowerCase();
-  const fallbackLang = envLang === 'en' || envLang === 'ja' ? envLang : '';
-  const lang = (langParam === 'en' || langParam === 'ja' ? langParam : fallbackLang) || 'ja';
-  const isEnglish = lang === 'en';
-  const shouldIncludeLang = Boolean(langParam || fallbackLang);
-  const langSuffix = shouldIncludeLang ? `?lang=${lang}` : '';
   const tags = glitch.tags ? glitch.tags.split(',').map(tag => tag.trim()) : [];
   const thumbnailUrl = getYouTubeThumbnail(glitch.video_url) || '';
   const [thumbError, setThumbError] = useState(false);
@@ -55,7 +49,7 @@ export default function GlitchCard({ glitch, compact = false }: GlitchCardProps)
   const showThumbnail = thumbnailUrl.length > 0 && !thumbError;
 
   return (
-    <Link href={`/glitch/${glitch.id}${langSuffix}`} className={`glitch-card ${compact ? 'glitch-card--compact' : ''}`}>
+    <Link href={`/glitch/${glitch.id}`} className={`glitch-card ${compact ? 'glitch-card--compact' : ''}`}>
       <div className="glitch-card__thumb">
         {showThumbnail ? (
           <Image
@@ -67,7 +61,7 @@ export default function GlitchCard({ glitch, compact = false }: GlitchCardProps)
             onError={() => setThumbError(true)}
           />
         ) : (
-          <span>{isEnglish ? 'No video' : '動画なし'}</span>
+          <span>No video</span>
         )}
       </div>
       <div className="glitch-card__body">
@@ -80,7 +74,7 @@ export default function GlitchCard({ glitch, compact = false }: GlitchCardProps)
         <div className="glitch-card__stamp-row">
           {stampTxUrl ? (
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', flexWrap: 'wrap' }}>
-            <span className="tag-badge tag-badge--success">{isEnglish ? 'Stamped' : '刻印済み'}</span>
+            <span className="tag-badge tag-badge--success">Stamped</span>
             <span
               className="tag-badge tag-badge--tx"
               role="link"
@@ -117,7 +111,15 @@ export default function GlitchCard({ glitch, compact = false }: GlitchCardProps)
         )}
         {glitch.voteCount !== undefined && (
           <div className="glitch-card__vote">
-            ▲ {glitch.voteCount} {isEnglish ? 'votes' : '票'}
+            {glitch.voteCount} votes
+          </div>
+        )}
+        {glitch.author_address && (
+          <div className="glitch-card__discoverer">
+            <span className="glitch-card__discoverer-icon" aria-hidden="true">◈</span>
+            <span className="glitch-card__discoverer-address">
+              {glitch.author_address.slice(0, 6)}...{glitch.author_address.slice(-4)}
+            </span>
           </div>
         )}
       </div>

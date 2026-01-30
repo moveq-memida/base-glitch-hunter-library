@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import {
   useAccount,
   useReadContract,
@@ -17,6 +17,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import GlitchCard from '@/components/GlitchCard';
 import CelebrationBurst from '@/components/CelebrationBurst';
+import DiscoveryBadge from '@/components/DiscoveryBadge';
 import {
   glitchRegistryABI,
   GLITCH_REGISTRY_ADDRESS,
@@ -37,6 +38,11 @@ interface Glitch {
   stamp_hash?: string | null;
   stamp_tx_hash?: string | null;
   stamped_at?: string | Date | null;
+  created_at?: string | Date;
+  speedrun_category?: string | null;
+  estimated_time_save?: string | null;
+  difficulty?: number | null;
+  game_version?: string | null;
 }
 
 interface RelatedGlitch {
@@ -84,153 +90,6 @@ export default function GlitchDetailClient({
   nextGlitchId = null,
 }: GlitchDetailClientProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const langParam = searchParams.get('lang');
-  const envLang = (process.env.NEXT_PUBLIC_LANG || '').toLowerCase();
-  const fallbackLang = envLang === 'en' || envLang === 'ja' ? envLang : '';
-  const lang = (langParam === 'en' || langParam === 'ja' ? langParam : fallbackLang) || 'ja';
-  const isEnglish = lang === 'en';
-  const shouldIncludeLang = Boolean(langParam || fallbackLang);
-
-  const withLang = (href: string) => {
-    if (!shouldIncludeLang) return href;
-    if (!href.startsWith('/') || href.includes('lang=')) return href;
-    const [path, query] = href.split('?');
-    const params = new URLSearchParams(query || '');
-    params.set('lang', lang);
-    return `${path}?${params.toString()}`;
-  };
-
-  const homeHref = withLang('/');
-  const submitHref = withLang('/submit');
-
-  const copy = useMemo(
-    () =>
-      isEnglish
-        ? {
-            headerAction: 'Submit',
-            notFound: 'Glitch not found.',
-            backToList: 'Back to list',
-            labels: {
-              game: 'Game',
-              platform: 'Platform',
-              hunter: 'Hunter',
-              noVideo: 'No video',
-              videoUnavailable: 'Video unavailable.',
-              openVideo: 'Open original',
-              vote: '▲ Vote',
-              voted: 'Voted',
-              voting: 'Confirming...',
-              votingWallet: 'Confirm in wallet',
-              voteDone: 'Voted!',
-              networkStatus: (current: string, target: string) =>
-                `Current network: ${current} (Voting/stamping requires ${target})`,
-              connectToVote: 'Connect wallet to vote.',
-              walletConfirm: 'Confirm in wallet.',
-              stamped: 'Stamped',
-              notStamped: 'Not stamped',
-              viewTx: 'View tx',
-              stamping: 'Confirming...',
-              stampingWallet: 'Confirm in wallet',
-              stampCta: 'Stamp on Base',
-              stampInfo: 'Only a hash is stored on Base. Content stays offchain.',
-              stampHash: 'stampHash',
-              copy: 'Copy',
-              related: (game: string) => `More glitches in ${game}`,
-              voteSubmitted: 'Vote submitted. Waiting for confirmation...',
-              stampSubmitted: 'Stamp submitted. Waiting for confirmation...',
-              toastVote: 'Voted',
-              toastStamp: 'Stamped',
-              celebrateVote: 'Vote complete',
-              celebrateStamp: 'Stamp complete',
-              prevGlitch: 'Previous',
-              nextGlitch: 'Next glitch',
-              randomGlitch: 'Random',
-            },
-            errors: {
-              walletRequiredVote: 'Connect your wallet to vote.',
-              postNotFound: 'Glitch not found.',
-              contractMissing: 'Contract address is missing.',
-              alreadyVoted: 'You already voted for this post.',
-              switchNetwork: (label: string) => `Please switch your wallet to ${label}.`,
-              voteFailed: 'Vote failed. Try again.',
-              voteConfirmFailed: (label: string) =>
-                `Vote confirmation failed. Please check you're on ${label}.`,
-              walletRequiredStamp: 'Connect your wallet to stamp.',
-              stampHashMissing: 'stampHash is not ready for this post.',
-              stampContractMissing: 'Stamp contract is missing.',
-              stampFailed: 'Stamp failed. Try again.',
-              stampConfirmFailed: (label: string) =>
-                `Stamp confirmation failed. Please check you're on ${label}.`,
-              txCanceled: 'Transaction canceled.',
-              alreadyStamped: 'This post is already stamped.',
-              stampFailedWithMessage: (message: string) => `Stamp failed: ${message}`,
-              copyFailed: 'Failed to copy stampHash.',
-            },
-          }
-        : {
-            headerAction: '投稿する',
-            notFound: '投稿が見つかりません。',
-            backToList: '一覧に戻る',
-            labels: {
-              game: 'ゲーム',
-              platform: '機種',
-              hunter: '発見者',
-              noVideo: '動画なし',
-              videoUnavailable: '動画を再生できません。',
-              openVideo: '元の動画を開く',
-              vote: '▲ 投票',
-              voted: '投票済み',
-              voting: '確定中...',
-              votingWallet: 'ウォレットで承認',
-              voteDone: '投票完了！',
-              networkStatus: (current: string, target: string) =>
-                `現在のネットワーク: ${current}（投票/スタンプは${target}が必要）`,
-              connectToVote: '投票するにはウォレット接続が必要です。',
-              walletConfirm: 'ウォレットで承認してください。',
-              stamped: '刻印済み',
-              notStamped: '未スタンプ',
-              viewTx: 'Txを見る',
-              stamping: '確定中...',
-              stampingWallet: 'ウォレットで承認',
-              stampCta: 'Baseにスタンプ',
-              stampInfo: 'Baseにはハッシュだけ保存。内容はオフチェーンのままです。',
-              stampHash: 'stampHash',
-              copy: 'コピー',
-              related: (game: string) => `${game} の他のバグ`,
-              voteSubmitted: '投票を送信しました。確定待ち...',
-              stampSubmitted: 'スタンプを送信しました。確定待ち...',
-              toastVote: '投票しました',
-              toastStamp: 'スタンプしました',
-              celebrateVote: '投票完了',
-              celebrateStamp: 'スタンプ完了',
-              prevGlitch: '前のグリッチ',
-              nextGlitch: '次のグリッチ',
-              randomGlitch: 'ランダム',
-            },
-            errors: {
-              walletRequiredVote: '投票するにはウォレット接続が必要です。',
-              postNotFound: '投稿が見つかりません。',
-              contractMissing: 'コントラクトアドレスが未設定です。',
-              alreadyVoted: 'この投稿には投票済みです。',
-              switchNetwork: (label: string) => `ウォレットを${label}に切り替えてください。`,
-              voteFailed: '投票に失敗しました。もう一度お試しください。',
-              voteConfirmFailed: (label: string) =>
-                `投票の確定に失敗しました。${label}か確認してください。`,
-              walletRequiredStamp: 'スタンプするにはウォレット接続が必要です。',
-              stampHashMissing: 'この投稿のstampHashがまだ生成されていません。',
-              stampContractMissing: 'スタンプ用コントラクトが未設定です。',
-              stampFailed: 'スタンプに失敗しました。もう一度お試しください。',
-              stampConfirmFailed: (label: string) =>
-                `スタンプの確定に失敗しました。${label}か確認してください。`,
-              txCanceled: 'トランザクションがキャンセルされました。',
-              alreadyStamped: 'この投稿は既にスタンプ済みです。',
-              stampFailedWithMessage: (message: string) => `スタンプに失敗しました: ${message}`,
-              copyFailed: 'stampHashのコピーに失敗しました。',
-            },
-          },
-    [isEnglish]
-  );
 
   const [error, setError] = useState<string | null>(null);
   const [stampTxHash, setStampTxHash] = useState<string | null>(glitch?.stamp_tx_hash || null);
@@ -313,22 +172,22 @@ export default function GlitchDetailClient({
     setError(null);
 
     if (!isConnected || !address) {
-      setError(copy.errors.walletRequiredVote);
+      setError('Connect your wallet to vote.');
       return;
     }
 
     if (!glitch) {
-      setError(copy.errors.postNotFound);
+      setError('Glitch not found.');
       return;
     }
 
     if (!GLITCH_REGISTRY_ADDRESS) {
-      setError(copy.errors.contractMissing);
+      setError('Contract address is missing.');
       return;
     }
 
     if (hasVoted) {
-      setError(copy.errors.alreadyVoted);
+      setError('You already voted for this post.');
       return;
     }
 
@@ -337,7 +196,7 @@ export default function GlitchDetailClient({
         await switchChain({ chainId: targetChainId });
       } catch (switchError) {
         console.error('Network switch error:', switchError);
-        setError(copy.errors.switchNetwork(targetChainLabel));
+        setError(`Please switch your wallet to ${targetChainLabel}.`);
         return;
       }
     }
@@ -345,7 +204,7 @@ export default function GlitchDetailClient({
     try {
       const { data: latestHasVoted } = await refetchHasVoted();
       if (latestHasVoted) {
-        setError(copy.errors.alreadyVoted);
+        setError('You already voted for this post.');
         return;
       }
 
@@ -368,7 +227,7 @@ export default function GlitchDetailClient({
       }
     } catch (upvoteError) {
       console.error('Upvote error:', upvoteError);
-      setError(copy.errors.voteFailed);
+      setError('Vote failed. Try again.');
     }
   };
 
@@ -413,42 +272,42 @@ export default function GlitchDetailClient({
   useEffect(() => {
     if (!isConfirmError || !confirmError) return;
     console.error('Upvote confirmation error:', confirmError);
-    setError(copy.errors.voteConfirmFailed(targetChainLabel));
-  }, [isConfirmError, confirmError, targetChainLabel, copy.errors]);
+    setError(`Vote confirmation failed. Please check you're on ${targetChainLabel}.`);
+  }, [isConfirmError, confirmError, targetChainLabel]);
 
   useEffect(() => {
     if (!upvoteWriteError) return;
     const message = upvoteWriteError.message || 'Transaction failed';
     if (message.includes('Already voted')) {
-      setError(copy.errors.alreadyVoted);
+      setError('You already voted for this post.');
     } else if (message.includes('User rejected') || message.includes('user rejected')) {
-      setError(copy.errors.txCanceled);
+      setError('Transaction canceled.');
     } else {
-      setError(copy.errors.voteFailed);
+      setError('Vote failed. Try again.');
     }
     resetUpvoteWrite();
-  }, [upvoteWriteError, resetUpvoteWrite, copy.errors]);
+  }, [upvoteWriteError, resetUpvoteWrite]);
 
   const handleStamp = async () => {
     setError(null);
 
     if (!isConnected || !address) {
-      setError(copy.errors.walletRequiredStamp);
+      setError('Connect your wallet to stamp.');
       return;
     }
 
     if (!glitch) {
-      setError(copy.errors.postNotFound);
+      setError('Glitch not found.');
       return;
     }
 
     if (!glitch.stamp_hash) {
-      setError(copy.errors.stampHashMissing);
+      setError('stampHash is not ready for this post.');
       return;
     }
 
     if (!GLITCH_STAMP_ADDRESS) {
-      setError(copy.errors.stampContractMissing);
+      setError('Stamp contract is missing.');
       return;
     }
 
@@ -457,7 +316,7 @@ export default function GlitchDetailClient({
         await switchChain({ chainId: targetChainId });
       } catch (switchError) {
         console.error('Network switch error:', switchError);
-        setError(copy.errors.switchNetwork(targetChainLabel));
+        setError(`Please switch your wallet to ${targetChainLabel}.`);
         return;
       }
     }
@@ -474,7 +333,7 @@ export default function GlitchDetailClient({
       });
     } catch (stampError) {
       console.error('Stamp error:', stampError);
-      setError(copy.errors.stampFailed);
+      setError('Stamp failed. Try again.');
     }
   };
 
@@ -492,8 +351,8 @@ export default function GlitchDetailClient({
   useEffect(() => {
     if (!isStampConfirmError || !stampConfirmError) return;
     console.error('Stamp confirmation error:', stampConfirmError);
-    setError(copy.errors.stampConfirmFailed(targetChainLabel));
-  }, [isStampConfirmError, stampConfirmError, targetChainLabel, copy.errors]);
+    setError(`Stamp confirmation failed. Please check you're on ${targetChainLabel}.`);
+  }, [isStampConfirmError, stampConfirmError, targetChainLabel]);
 
   useEffect(() => {
     if (!isStampConfirmed || !stampWriteTxHash || !glitch) return;
@@ -543,23 +402,23 @@ export default function GlitchDetailClient({
     if (!stampWriteError) return;
     const message = stampWriteError.message || 'Transaction failed';
     if (message.includes('User rejected') || message.includes('user rejected')) {
-      setError(copy.errors.txCanceled);
+      setError('Transaction canceled.');
     } else if (message.includes('Already stamped')) {
-      setError(copy.errors.alreadyStamped);
+      setError('This post is already stamped.');
     } else {
-      setError(copy.errors.stampFailedWithMessage(message.slice(0, 120)));
+      setError(`Stamp failed: ${message.slice(0, 120)}`);
     }
     resetStampWrite();
-  }, [stampWriteError, resetStampWrite, copy.errors]);
+  }, [stampWriteError, resetStampWrite]);
 
   if (!glitch) {
     return (
       <div className="page">
-        <Header actionText={copy.headerAction} actionHref={submitHref} />
+        <Header actionText="Submit" actionHref="/submit" />
         <main className="page-main">
-          <p>{copy.notFound}</p>
-          <Link href={homeHref} className="page-back-link">
-            {copy.backToList}
+          <p>Glitch not found.</p>
+          <Link href="/" className="page-back-link">
+            Back to list
           </Link>
         </main>
         <Footer />
@@ -570,42 +429,36 @@ export default function GlitchDetailClient({
   const tags = glitch.tags ? glitch.tags.split(',').map((tag) => tag.trim()) : [];
   const voteCountDisplay = displayVoteCount ?? (voteCount != null ? Number(voteCount) : 0);
   const voteButtonLabel = voteToastTxHash
-    ? copy.labels.voteDone
+    ? 'Voted!'
     : isUpvotePending
-    ? copy.labels.votingWallet
+    ? 'Confirm in wallet'
     : isConfirming
-    ? copy.labels.voting
+    ? 'Confirming...'
     : hasVoted
-    ? copy.labels.voted
-    : copy.labels.vote;
+    ? 'Voted'
+    : '▲ Vote';
   const stampButtonLabel = isStampPending
-    ? copy.labels.stampingWallet
+    ? 'Confirm in wallet'
     : isStampConfirming
-    ? copy.labels.stamping
-    : copy.labels.stampCta;
+    ? 'Confirming...'
+    : 'Stamp on Base';
   const voteStatusTxLink = upvoteWriteTxHash ? `${basescanBaseUrl}/tx/${upvoteWriteTxHash}` : null;
   const stampStatusTxLink = stampWriteTxHash ? `${basescanBaseUrl}/tx/${stampWriteTxHash}` : null;
 
   return (
     <div className="page">
-      <Header actionText={copy.headerAction} actionHref={submitHref} />
+      <Header actionText="Submit" actionHref="/submit" />
       <main className="page-main">
-        <Link href={homeHref} className="page-back-link">
-          {copy.backToList}
+        <Link href="/" className="page-back-link">
+          Back to list
         </Link>
 
         <h1 className="glitch-detail__title">{glitch.title}</h1>
 
         <div className="glitch-meta">
-          <span>
-            {copy.labels.game}: {glitch.game_name}
-          </span>
-          <span>
-            {copy.labels.platform}: {glitch.platform}
-          </span>
-          <span>
-            {copy.labels.hunter}: {glitch.author_address}
-          </span>
+          <span>Game: {glitch.game_name}</span>
+          <span>Platform: {glitch.platform}</span>
+          <span>Hunter: {glitch.author_address}</span>
         </div>
 
         <section className="glitch-content">
@@ -624,14 +477,14 @@ export default function GlitchDetailClient({
                 />
               ) : (
                 <span>
-                  {glitch.video_url ? copy.labels.videoUnavailable : copy.labels.noVideo}
+                  {glitch.video_url ? 'Video unavailable.' : 'No video'}
                 </span>
               )}
             </div>
             {glitch.video_url && videoError && (
               <div className="glitch-action__status">
                 <a href={glitch.video_url} target="_blank" rel="noopener noreferrer">
-                  {copy.labels.openVideo}
+                  Open original
                 </a>
               </div>
             )}
@@ -676,17 +529,17 @@ export default function GlitchDetailClient({
 
             {isConnected && chainId !== targetChainId && (
               <div className="glitch-action__status">
-                {copy.labels.networkStatus(currentChainLabel, targetChainLabel)}
+                Current network: {currentChainLabel} (Voting/stamping requires {targetChainLabel})
               </div>
             )}
             {!isConnected && (
-              <div className="glitch-action__status">{copy.labels.connectToVote}</div>
+              <div className="glitch-action__status">Connect wallet to vote.</div>
             )}
             {!isConfirmed && voteStatusTxLink && (
               <div className="glitch-action__status">
-                <span>{copy.labels.voteSubmitted}</span>
+                <span>Vote submitted. Waiting for confirmation...</span>
                 <a href={voteStatusTxLink} target="_blank" rel="noopener noreferrer">
-                  {copy.labels.viewTx}
+                  View tx
                 </a>
               </div>
             )}
@@ -696,7 +549,7 @@ export default function GlitchDetailClient({
                 className={`tag-badge${stampTxHash ? ' tag-badge--success' : ''}`}
                 style={{ fontSize: '0.875rem' }}
               >
-                {stampTxHash ? copy.labels.stamped : copy.labels.notStamped}
+                {stampTxHash ? 'Stamped' : 'Not stamped'}
               </span>
               {stampTxHash ? (
                 <a
@@ -706,7 +559,7 @@ export default function GlitchDetailClient({
                   rel="noopener noreferrer"
                   style={{ whiteSpace: 'nowrap' }}
                 >
-                  {copy.labels.viewTx}
+                  View tx
                 </a>
               ) : (
                 <button
@@ -727,14 +580,14 @@ export default function GlitchDetailClient({
                 </button>
               )}
             </section>
-            <p style={{ color: 'var(--c-text-muted)', fontSize: '0.875rem', margin: 'var(--sp-xs) 0 0' }}>
-              {copy.labels.stampInfo}
+            <p style={{ color: 'var(--text-dim)', fontSize: '0.875rem', margin: 'var(--sp-xs) 0 0' }}>
+              Only a hash is stored on Base. Content stays offchain.
             </p>
             {!isStampConfirmed && stampStatusTxLink && !stampTxHash && (
               <div className="glitch-action__status">
-                <span>{copy.labels.stampSubmitted}</span>
+                <span>Stamp submitted. Waiting for confirmation...</span>
                 <a href={stampStatusTxLink} target="_blank" rel="noopener noreferrer">
-                  {copy.labels.viewTx}
+                  View tx
                 </a>
               </div>
             )}
@@ -749,7 +602,7 @@ export default function GlitchDetailClient({
                   flexWrap: 'wrap',
                 }}
               >
-                <span style={{ color: 'var(--c-text-muted)', fontSize: '0.875rem' }}>{copy.labels.stampHash}</span>
+                <span style={{ color: 'var(--text-dim)', fontSize: '0.875rem' }}>stampHash</span>
                 <code style={{ fontSize: '0.75rem', wordBreak: 'break-all' }}>{glitch.stamp_hash}</code>
                 <button
                   type="button"
@@ -760,39 +613,50 @@ export default function GlitchDetailClient({
                       await navigator.clipboard.writeText(glitch.stamp_hash!);
                     } catch (copyError) {
                       console.error('Copy error:', copyError);
-                      setError(copy.errors.copyFailed);
+                      setError('Failed to copy stampHash.');
                     }
                   }}
                 >
-                  {copy.labels.copy}
+                  Copy
                 </button>
               </div>
             )}
+
+            {/* Discovery Proof Section */}
+            <section className="discovery-proof-section">
+              <h3 className="discovery-proof-section__title">Discovery Proof</h3>
+              <p className="discovery-proof-section__desc">This glitch was first reported by the address below. The timestamp proves the discovery.</p>
+              <DiscoveryBadge
+                authorAddress={glitch.author_address}
+                createdAt={glitch.created_at || new Date()}
+                stampTxHash={glitch.stamp_tx_hash}
+              />
+            </section>
           </div>
         </section>
 
         <div className="glitch-detail__nav">
           {prevGlitchId ? (
-            <Link href={withLang(`/glitch/${prevGlitchId}`)} className="pagination__link">
-              {copy.labels.prevGlitch}
+            <Link href={`/glitch/${prevGlitchId}`} className="pagination__link">
+              Previous
             </Link>
           ) : null}
           {nextGlitchId ? (
-            <Link href={withLang(`/glitch/${nextGlitchId}`)} className="pagination__link">
-              {copy.labels.nextGlitch}
+            <Link href={`/glitch/${nextGlitchId}`} className="pagination__link">
+              Next glitch
             </Link>
           ) : null}
           <Link
-            href={withLang(`/glitch/random?excludeId=${glitch.id}&game=${encodeURIComponent(glitch.game_name)}`)}
+            href={`/glitch/random?excludeId=${glitch.id}&game=${encodeURIComponent(glitch.game_name)}`}
             className="pagination__link"
           >
-            {copy.labels.randomGlitch}
+            Random
           </Link>
         </div>
 
         {relatedGlitches.length > 0 && (
           <section className="glitch-related">
-            <h3 className="glitch-related__title">{copy.labels.related(glitch.game_name)}</h3>
+            <h3 className="glitch-related__title">More glitches in {glitch.game_name}</h3>
             <div className="glitch-list">
               {relatedGlitches.map((related) => (
                 <GlitchCard key={related.id} glitch={related} compact />
@@ -804,22 +668,22 @@ export default function GlitchDetailClient({
       {celebrate && (
         <CelebrationBurst
           variant={celebrate}
-          label={celebrate === 'vote' ? copy.labels.celebrateVote : copy.labels.celebrateStamp}
+          label={celebrate === 'vote' ? 'Vote complete' : 'Stamp complete'}
         />
       )}
       {voteToastTxHash && (
         <div className="toast" role="status" aria-live="polite">
-          <span>{copy.labels.toastVote}</span>
+          <span>Voted</span>
           <a href={`${basescanBaseUrl}/tx/${voteToastTxHash}`} target="_blank" rel="noopener noreferrer" className="toast__link">
-            {copy.labels.viewTx}
+            View tx
           </a>
         </div>
       )}
       {stampToastTxHash && (
         <div className="toast" role="status" aria-live="polite">
-          <span>{copy.labels.toastStamp}</span>
+          <span>Stamped</span>
           <a href={`${basescanBaseUrl}/tx/${stampToastTxHash}`} target="_blank" rel="noopener noreferrer" className="toast__link">
-            {copy.labels.viewTx}
+            View tx
           </a>
         </div>
       )}

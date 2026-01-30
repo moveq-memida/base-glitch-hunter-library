@@ -11,31 +11,94 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// Enums
+enum SpeedrunCategory {
+  ANY_PERCENT
+  HUNDRED_PERCENT
+  LOW_PERCENT
+  GLITCHLESS
+  ALL_BOSSES
+  OTHER
+}
+
+enum UserTier {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+  DIAMOND
+  LEGENDARY
+}
+
+enum ContestStatus {
+  DRAFT
+  ACTIVE
+  ENDED
 }
 
 model Glitch {
-  id               Int      @id @default(autoincrement())
-  title            String
-  game_name        String
-  platform         String
-  video_url        String?
-  description      String   @db.Text
-  tags             String
-  author_address   String
-  onchain_glitch_id Int
-  content_hash     String
+  id                  Int               @id @default(autoincrement())
+  title               String
+  game_name           String
+  platform            String
+  video_url           String?
+  description         String            @db.Text
+  tags                String
+  author_address      String
+  onchain_glitch_id   Int
+  content_hash        String
   // Server-generated keccak256 stamp over canonical payload (see README).
-  stamp_hash       String?
+  stamp_hash          String?
   // Transaction hash after onchain stamping (Base).
-  stamp_tx_hash    String?
-  stamped_at       DateTime?
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
-  daily_featured   DailyFeatured[]
+  stamp_tx_hash       String?
+  stamped_at          DateTime?
+  created_at          DateTime          @default(now())
+  updated_at          DateTime          @updatedAt
+
+  // Phase 2: Speedrunner features
+  speedrun_category   SpeedrunCategory? @default(ANY_PERCENT)
+  estimated_time_save String?
+  difficulty          Int?              @default(3)
+  game_version        String?
+
+  // Relations
+  daily_featured      DailyFeatured[]
+  reproduction_steps  ReproductionStep[]
+  votes               Vote[]
+  contest_entries     ContestEntry[]
+  analytics_events    AnalyticsEvent[]
+
+  // Phase 5: Game relation
+  game_id             Int?
+  game                Game?             @relation(fields: [game_id], references: [id])
+
+  // Phase 3: User relation
+  user_id             Int?
+  user                User?             @relation(fields: [user_id], references: [id])
 
   @@index([onchain_glitch_id])
   @@unique([stamp_hash])
   @@index([created_at])
+  @@index([game_id])
+  @@index([user_id])
+  @@index([speedrun_category])
+}
+
+model ReproductionStep {
+  id          Int      @id @default(autoincrement())
+  glitch_id   Int
+  step_number Int
+  instruction String   @db.Text
+  timestamp   String?
+  created_at  DateTime @default(now())
+
+  glitch      Glitch   @relation(fields: [glitch_id], references: [id], onDelete: Cascade)
+
+  @@index([glitch_id])
+  @@unique([glitch_id, step_number])
 }
 
 model DailyFeatured {
@@ -45,4 +108,150 @@ model DailyFeatured {
   created_at DateTime @default(now())
 
   @@index([glitch_id])
+}
+
+// Phase 3: User and ranking system
+model User {
+  id                   Int         @id @default(autoincrement())
+  wallet_address       String?     @unique
+  privy_user_id        String?     @unique
+  email                String?
+  discord_id           String?
+  display_name         String?
+  avatar_url           String?
+  bio                  String?     @db.Text
+
+  // Stats
+  total_submissions    Int         @default(0)
+  total_votes_received Int         @default(0)
+  total_stamps         Int         @default(0)
+
+  // Ranking
+  tier                 UserTier    @default(BRONZE)
+  reputation_points    Int         @default(0)
+
+  created_at           DateTime    @default(now())
+  updated_at           DateTime    @updatedAt
+
+  // Relations
+  glitches             Glitch[]
+  votes                Vote[]
+  user_badges          UserBadge[]
+  contest_entries      ContestEntry[]
+
+  @@index([tier])
+  @@index([reputation_points])
+}
+
+model Vote {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  glitch_id  Int
+  created_at DateTime @default(now())
+
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  glitch     Glitch   @relation(fields: [glitch_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, glitch_id])
+  @@index([glitch_id])
+}
+
+model Badge {
+  id             Int         @id @default(autoincrement())
+  code           String      @unique
+  name_en        String
+  name_ja        String
+  description_en String
+  description_ja String
+  icon_url       String?
+  tier           UserTier    @default(BRONZE)
+
+  // Phase 7: Monetization
+  is_premium     Boolean     @default(false)
+  price_usd      Decimal?    @db.Decimal(10, 2)
+
+  created_at     DateTime    @default(now())
+
+  user_badges    UserBadge[]
+}
+
+model UserBadge {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  badge_id   Int
+  awarded_at DateTime @default(now())
+
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  badge      Badge    @relation(fields: [badge_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, badge_id])
+  @@index([badge_id])
+}
+
+// Phase 5: Game database
+model Game {
+  id              Int      @id @default(autoincrement())
+  slug            String   @unique
+  name            String
+  aliases         String[] @default([])
+  release_year    Int?
+  platforms       String[] @default([])
+  speedrun_com_id String?
+  cover_url       String?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  glitches        Glitch[]
+
+  @@index([name])
+}
+
+// Phase 6: Contest system
+model Contest {
+  id                Int           @id @default(autoincrement())
+  title             String
+  description       String        @db.Text
+  start_date        DateTime
+  end_date          DateTime
+  game_filter       String?
+  prize_description String?       @db.Text
+  status            ContestStatus @default(DRAFT)
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
+
+  entries           ContestEntry[]
+
+  @@index([status])
+  @@index([start_date, end_date])
+}
+
+model ContestEntry {
+  id           Int      @id @default(autoincrement())
+  contest_id   Int
+  glitch_id    Int
+  user_id      Int
+  submitted_at DateTime @default(now())
+
+  contest      Contest  @relation(fields: [contest_id], references: [id], onDelete: Cascade)
+  glitch       Glitch   @relation(fields: [glitch_id], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([contest_id, glitch_id])
+  @@index([user_id])
+}
+
+// Phase 7: Analytics
+model AnalyticsEvent {
+  id         Int      @id @default(autoincrement())
+  event_type String
+  glitch_id  Int?
+  user_id    Int?
+  metadata   Json?
+  created_at DateTime @default(now())
+
+  glitch     Glitch?  @relation(fields: [glitch_id], references: [id], onDelete: SetNull)
+
+  @@index([event_type])
+  @@index([glitch_id])
+  @@index([created_at])
 }

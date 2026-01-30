@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { buildStampPayload, computeStampHash } from '@/lib/stamp';
+import { notifyNewGlitch } from '@/lib/discord';
 
 export async function GET(request: NextRequest) {
   try {
@@ -38,6 +39,12 @@ export async function POST(request: NextRequest) {
       author_address,
       onchain_glitch_id,
       content_hash,
+      // New speedrun fields
+      speedrun_category,
+      difficulty,
+      estimated_time_save,
+      game_version,
+      reproduction_steps,
     } = body;
 
     // Validate required fields
@@ -59,21 +66,54 @@ export async function POST(request: NextRequest) {
     });
     const stampHash = computeStampHash(stampPayload);
 
-    const glitch = await prisma.glitch.create({
-      data: {
-        title,
-        game_name,
-        platform,
-        video_url: video_url || '',
-        description,
-        tags: tags || '',
-        author_address,
-        onchain_glitch_id,
-        content_hash,
-        stamp_hash: stampHash,
-        created_at: new Date(createdAtIso),
-      },
+    // Create glitch with reproduction steps in a transaction
+    const glitch = await prisma.$transaction(async (tx) => {
+      const createdGlitch = await tx.glitch.create({
+        data: {
+          title,
+          game_name,
+          platform,
+          video_url: video_url || '',
+          description,
+          tags: tags || '',
+          author_address,
+          onchain_glitch_id,
+          content_hash,
+          stamp_hash: stampHash,
+          created_at: new Date(createdAtIso),
+          // New speedrun fields
+          speedrun_category: speedrun_category || 'ANY_PERCENT',
+          difficulty: difficulty ?? 3,
+          estimated_time_save: estimated_time_save || null,
+          game_version: game_version || null,
+        },
+      });
+
+      // Create reproduction steps if provided
+      if (reproduction_steps && Array.isArray(reproduction_steps) && reproduction_steps.length > 0) {
+        await tx.reproductionStep.createMany({
+          data: reproduction_steps.map((step: { instruction: string; timestamp?: string }, index: number) => ({
+            glitch_id: createdGlitch.id,
+            step_number: index + 1,
+            instruction: step.instruction,
+            timestamp: step.timestamp || null,
+          })),
+        });
+      }
+
+      return createdGlitch;
     });
+
+    // Send Discord notification (non-blocking)
+    notifyNewGlitch({
+      id: glitch.id,
+      title: glitch.title,
+      gameName: glitch.game_name,
+      platform: glitch.platform,
+      authorAddress: glitch.author_address,
+      videoUrl: glitch.video_url,
+      description: glitch.description,
+    }).catch((err) => console.error('Discord notification failed:', err));
 
     return NextResponse.json(glitch, { status: 201 });
   } catch (error) {

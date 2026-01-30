@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { GLITCH_STAMP_ADDRESS, glitchStampABI } from '@/lib/contracts';
 import { createPublicClient, decodeEventLog, http, isHex } from 'viem';
 import { base } from 'viem/chains';
+import { notifyStamp } from '@/lib/discord';
 
 export async function POST(request: NextRequest) {
   try {
@@ -81,13 +82,30 @@ export async function POST(request: NextRequest) {
       console.warn('Stamp confirmation verification skipped:', error);
     }
 
-    await prisma.glitch.update({
+    const updatedGlitch = await prisma.glitch.update({
       where: { id: glitchId },
       data: {
         stamp_tx_hash: txHash,
         stamped_at: verified ? verifiedAt : null,
       },
+      select: {
+        id: true,
+        title: true,
+        game_name: true,
+        author_address: true,
+      },
     });
+
+    // Send Discord notification for successful stamp (non-blocking)
+    if (verified) {
+      notifyStamp({
+        id: updatedGlitch.id,
+        title: updatedGlitch.title,
+        gameName: updatedGlitch.game_name,
+        txHash,
+        stamperAddress: updatedGlitch.author_address,
+      }).catch((err) => console.error('Discord stamp notification failed:', err));
+    }
 
     return NextResponse.json({ ok: true, verified });
   } catch (error) {
