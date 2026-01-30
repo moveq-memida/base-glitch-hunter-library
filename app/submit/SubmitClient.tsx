@@ -484,7 +484,7 @@ export default function SubmitClient() {
             >
               {getAllCategories().map((cat) => (
                 <option key={cat.value} value={cat.value}>
-                  {cat.labelEn}
+                  {cat.label}
                 </option>
               ))}
             </select>

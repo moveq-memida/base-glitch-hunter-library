@@ -58,7 +58,7 @@ export async function notifyNewGlitch(glitch: {
     return false;
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://glitchhunter.io';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://memida.xyz';
   const glitchUrl = `${baseUrl}/glitch/${glitch.id}`;
 
   // Extract YouTube thumbnail if available
@@ -117,7 +117,7 @@ export async function notifyStamp(glitch: {
     return false;
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://glitchhunter.io';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://memida.xyz';
   const glitchUrl = `${baseUrl}/glitch/${glitch.id}`;
   const txUrl = `https://basescan.org/tx/${glitch.txHash}`;
 
@@ -164,7 +164,7 @@ export async function notifyContestStart(contest: {
     return false;
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://glitchhunter.io';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://memida.xyz';
   const contestUrl = `${baseUrl}/contests/${contest.id}`;
 
   const message: DiscordMessage = {

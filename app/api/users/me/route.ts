@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getOrCreateUserByWallet, updateUserProfile } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { verifySIWESignature } from '@/lib/siwe';
+import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from '@/lib/rateLimit';
 
 export async function GET(request: NextRequest) {
   try {
@@ -53,14 +55,54 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  // Rate limiting
+  const rateLimitKey = getRateLimitKey(request, 'profile-update');
+  const rateLimit = checkRateLimit(rateLimitKey, RATE_LIMITS.profileUpdate);
+
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      {
+        status: 429,
+        headers: {
+          'X-RateLimit-Limit': String(rateLimit.limit),
+          'X-RateLimit-Remaining': String(rateLimit.remaining),
+          'X-RateLimit-Reset': String(rateLimit.resetAt),
+        },
+      }
+    );
+  }
+
   try {
     const body = await request.json();
-    const { walletAddress, displayName, bio, avatarUrl } = body;
+    const { walletAddress, displayName, bio, avatarUrl, message, signature } = body;
 
     if (!walletAddress) {
       return NextResponse.json(
         { error: 'Wallet address is required' },
         { status: 400 }
+      );
+    }
+
+    // Require signature verification for profile updates
+    if (!message || !signature) {
+      return NextResponse.json(
+        { error: 'Signature required for profile updates' },
+        { status: 401 }
+      );
+    }
+
+    // Verify the signature
+    const verification = await verifySIWESignature(
+      message,
+      signature as `0x${string}`,
+      walletAddress
+    );
+
+    if (!verification.valid) {
+      return NextResponse.json(
+        { error: verification.error || 'Invalid signature' },
+        { status: 401 }
       );
     }
 

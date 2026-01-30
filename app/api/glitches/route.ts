@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { buildStampPayload, computeStampHash } from '@/lib/stamp';
 import { notifyNewGlitch } from '@/lib/discord';
+import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from '@/lib/rateLimit';
 
 export async function GET(request: NextRequest) {
   try {
@@ -26,6 +27,24 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limiting
+  const rateLimitKey = getRateLimitKey(request, 'glitch-submit');
+  const rateLimit = checkRateLimit(rateLimitKey, RATE_LIMITS.glitchSubmit);
+
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: 'Too many submissions. Please try again later.' },
+      {
+        status: 429,
+        headers: {
+          'X-RateLimit-Limit': String(rateLimit.limit),
+          'X-RateLimit-Remaining': String(rateLimit.remaining),
+          'X-RateLimit-Reset': String(rateLimit.resetAt),
+        },
+      }
+    );
+  }
+
   try {
     const body = await request.json();
 

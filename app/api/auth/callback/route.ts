@@ -1,8 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getOrCreateUserByWallet } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { checkRateLimit, getRateLimitKey, RATE_LIMITS } from '@/lib/rateLimit';
 
 export async function POST(request: NextRequest) {
+  // Rate limiting
+  const rateLimitKey = getRateLimitKey(request, 'auth');
+  const rateLimit = checkRateLimit(rateLimitKey, RATE_LIMITS.auth);
+
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      {
+        status: 429,
+        headers: {
+          'X-RateLimit-Limit': String(rateLimit.limit),
+          'X-RateLimit-Remaining': String(rateLimit.remaining),
+          'X-RateLimit-Reset': String(rateLimit.resetAt),
+        },
+      }
+    );
+  }
+
   try {
     const body = await request.json();
     const { walletAddress } = body;
